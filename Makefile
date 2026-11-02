@@ -38,7 +38,7 @@ test-linux:
 coverage:
 	sh scripts/coverage.sh 0 && cp -f coverage/.resultset.json coverage-macos.json
 	sh test/linux-container.sh sh scripts/linux-coverage.sh
-	python3 scripts/coverage-gate.py '/(bin/kirisute|lib/[a-z]+\.sh)\Z' 100 coverage-macos.json coverage-linux.json
+	python3 scripts/coverage-gate.py '/(bin/kirisute|lib/[a-z0-9]+\.sh)\Z' 100 coverage-macos.json coverage-linux.json
 
 check: lint test
 

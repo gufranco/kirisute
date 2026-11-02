@@ -43,4 +43,4 @@ fi
 KIRISUTE_TEST_SHELL="${wrapper}" bats "$@" "${root}/test"
 
 cd "${root}"
-python3 scripts/coverage-gate.py '/(bin/kirisute|lib/[a-z]+\.sh)\Z' "${minimum}" coverage/.resultset.json
+python3 scripts/coverage-gate.py '/(bin/kirisute|lib/[a-z0-9]+\.sh)\Z' "${minimum}" coverage/.resultset.json
