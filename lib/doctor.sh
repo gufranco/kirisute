@@ -62,10 +62,22 @@ ks_doctor_tool() {
   ks_doctor_row "$1" ok "${ks_dt_found}, ${ks_dt_flavor}"
 }
 
+ks_doctor_maxcso() {
+  ks_dm_found="$(command -v maxcso 2>/dev/null || true)"
+  if [ -z "${ks_dm_found}" ]; then
+    ks_doctor_row maxcso missing "required, brew install gufranco/tap/maxcso"
+    return 1
+  fi
+  ks_dm_text="$(maxcso --version 2>&1 </dev/null)" || true
+  ks_dm_version="$(printf '%s\n' "${ks_dm_text}" | awk '{ for (i = 1; i <= NF; i++) if ($i ~ /^v[0-9]/) { print substr($i, 2); exit } }')"
+  ks_doctor_row maxcso ok "${ks_dm_found}${ks_dm_version:+, ${ks_dm_version}}"
+}
+
 ks_doctor() {
   ks_dr_status=0
-  for ks_dr_tool in awk od head tail tr wc mktemp mv stat chmod rm; do
+  for ks_dr_tool in awk od head tail tr wc mktemp mv stat chmod rm cmp; do
     ks_doctor_tool "${ks_dr_tool}" || ks_dr_status=1
   done
+  ks_doctor_maxcso || ks_dr_status=1
   return "${ks_dr_status}"
 }

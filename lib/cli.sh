@@ -14,6 +14,9 @@ usage:
   kirisute rename [options] <rom>...
                                 rename each ROM after the title and code in
                                 its header, such as KIRISUTE (KSTE).nds
+  kirisute compress [options] <iso>...
+                                write a compressed copy of each PSP disc image
+                                for ARK-4 and ARK-5, keeping the original
   kirisute doctor               check the tools kirisute needs
   kirisute version              print the version
   kirisute help                 print this page
@@ -28,9 +31,23 @@ options:
   --json                        print the result as one JSON object, for
                                 scripts
 
+compress:
+  --format cso|cso2|zso         CSO v1, CSO v2 or ZSO (default cso2); CSO v2
+                                mixes deflate and faster LZ4, ZSO reads fastest
+  --block 2048|4096|8192|16384  block size in bytes (default 8192)
+  --lz4-cost N                  let a CSO v2 block use LZ4 when that costs at
+                                most N% more space, 0 to 100 (default 0, LZ4
+                                only where it is smaller)
+  --best                        add one more slow trial, Zopfli for CSO or
+                                brute-force LZ4 for ZSO: a bit smaller
+
 environment:
   KIRISUTE_VERIFY               yes or no, the default for --verify, no
   KIRISUTE_BACKUP               yes or no, the default for --backup, no
+  KIRISUTE_FORMAT               the default for --format, cso2
+  KIRISUTE_BLOCK                the default for --block, 8192
+  KIRISUTE_LZ4_COST             the default for --lz4-cost, 0
+  KIRISUTE_BEST                 yes or no, the default for --best, no
 
 notes:
   A folder gives its .gba, .nds, .3ds, .cci, .cxi and .iso files; a file given
@@ -50,14 +67,22 @@ notes:
   interrupted run never leaves half a file. Symbolic links, hidden files and
   hidden folders are left alone. rename takes --dry-run, --recursive and
   --json, keeps the extension in lowercase, and never takes a name another
-  file has. -- ends the options, and a file named help, doctor, version or
-  rename is trimmed by giving its path, such as ./help.
+  file has. compress uses maxcso and writes game.cso or game.zso beside each
+  PSP disc image; its defaults give the same bytes as a CSO v2 that boots on
+  ARK-4 and ARK-5. It keeps a copy only after it decompresses back to the
+  original, which needs free space as large as the image for a moment. DAX
+  and JSO are not written: maxcso's DAX lacks the zlib headers ARK expects,
+  and no open JSO writer exists. -- ends the options, and a file named help,
+  doctor, version, rename or compress is trimmed by giving its path, such as
+  ./help.
 
 examples:
   kirisute --dry-run *.nds *.3ds
   kirisute --backup --verify game.nds
   kirisute --recursive ~/roms
   kirisute rename --dry-run *.gba
+  kirisute compress game.iso
+  kirisute compress --format zso --recursive ~/roms/psp
 USAGE
 }
 

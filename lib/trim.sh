@@ -16,6 +16,8 @@ ks_trim_mode() {
 }
 
 ks_cleanup() {
+  [ -z "${KS_TMP_CHECK}" ] || rm -f -- "${KS_TMP_CHECK}"
+  KS_TMP_CHECK=""
   [ -n "${KS_TMP}" ] || return 0
   rm -f -- "${KS_TMP}"
   KS_TMP=""

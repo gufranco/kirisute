@@ -14,6 +14,7 @@
   <a href="#quick-start"><strong>クイックスタート</strong></a> |
   <a href="#what-is-kept">残すもの</a> |
   <a href="#rename">名前の変更</a> |
+  <a href="#compress">圧縮</a> |
   <a href="#development">開発</a>
 </p>
 
@@ -50,6 +51,8 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 |:-------|:-----|:-------------|
 | `awk`、`od`、`head`、`tail`、`tr`、`wc` | ヘッダーを読み、ROM のデータを写します | Linux と macOS に標準で入っています |
 | `mktemp`、`mv`、`stat`、`chmod`、`rm` | 切り詰めたコピーを ROM の隣に書き、差し替えます | Linux と macOS に標準で入っています |
+| `cmp` | 圧縮したコピーが元に戻ることを確かめます | Linux と macOS に標準で入っています |
+| [maxcso](https://github.com/unknownbrackets/maxcso) | `compress` の CSO と ZSO のコピーを書きます | `brew install gufranco/tap/maxcso`。Homebrew の formula が一緒に入れます |
 
 ### インストール
 
@@ -82,6 +85,8 @@ mv                 ok       /bin/mv, bsd
 stat               ok       /usr/bin/stat, bsd
 chmod              ok       /bin/chmod, bsd
 rm                 ok       /bin/rm, bsd
+cmp                ok       /opt/homebrew/bin/cmp, gnu 3.12
+maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 ```
 
 ## 使い方
@@ -90,6 +95,7 @@ rm                 ok       /bin/rm, bsd
 |:---------|:-----|
 | `kirisute [options] <rom>...` | 各 ROM ファイルと、指定したフォルダの ROM ファイルを切り詰めます |
 | `kirisute rename [options] <rom>...` | 各 ROM の名前を、ヘッダーのタイトルとコードに変えます |
+| `kirisute compress [options] <iso>...` | 各 PSP ディスクイメージの CSO または ZSO のコピーを ARK-4 と ARK-5 向けに書きます |
 | 引数なしの `kirisute` | ターミナルでは ROM ファイルかフォルダを尋ねます。既定は現在のフォルダです |
 | `kirisute doctor` | 必要なツールを、それぞれの種類とバージョン付きで一覧にします |
 | `kirisute version`、`kirisute help` | バージョンか使い方のページを表示します |
@@ -110,6 +116,7 @@ kirisute --dry-run *.nds *.3ds           # 切り詰めで減る量を確かめ�
 kirisute --backup --verify game.nds      # 元を残し、詰め物にデータがあれば断る
 kirisute --recursive ~/roms              # ライブラリ全体を切り詰める
 kirisute rename --dry-run *.gba          # 各 ROM が付ける名前を確かめる
+kirisute compress game.iso               # ARK-4 と ARK-5 向けに game.cso を書く
 ```
 
 <a id="what-is-kept"></a>
@@ -157,6 +164,42 @@ Dry run: 4 ROMs would be renamed. Nothing was changed.
 - 拡張子は小文字にします。タイトルのスラッシュとコロンはハイフンになり、制御文字は落とします。
 - ほかのファイルがすでに持つ名前は決して取りません。その ROM は警告付きでそのまま残ります。大文字小文字だけの変更も Mac のディスクで動きます。
 - `rename` は `--dry-run`、`--recursive`、`--json` を受け付けます。
+
+<a id="compress"></a>
+
+## 圧縮
+
+`kirisute compress` は [maxcso](https://github.com/unknownbrackets/maxcso) で各 PSP ディスクイメージの圧縮コピーを、カスタムファームウェア ARK-4 と ARK-5 が読める形式で書き、元のファイルは残します。
+
+```console
+$ kirisute compress --dry-run umd.iso
+
+Files:  1 ROM, 100.0 MiB
+Plan:   compress each PSP disc image to CSO v2 in 8 KiB blocks
+        use LZ4 only where it is smaller than deflate
+        keep each original and check that each copy decompresses to it
+        dry run: list each copy and change nothing
+
+Would compress umd.iso to umd.cso as CSO v2.
+Dry run: 1 ROM would be compressed. Nothing was changed.
+```
+
+| オプション | 効果 | 既定 |
+|:-----------|:-----|:-----|
+| `--format cso` | CSO v1。deflate のみで、古いファームウェアも読める形式。3 つの中で読み込みが最も遅い | |
+| `--format cso2` | CSO v2。ブロックごとに deflate か LZ4 を選び、小さく読み込みも速い | 既定 |
+| `--format zso` | ZSO。LZ4 のみで読み込みが最も速く、ファイルは大きめ | |
+| `--block N` | ブロックサイズ。2048、4096、8192、16384 バイト。大きいほどわずかによく縮みます | 8192 |
+| `--lz4-cost N` | CSO v2 で、LZ4 の増分が N% 以内のブロックに LZ4 を使い、容量と読み込み速度を引き換えます。0 なら LZ4 が小さいブロックだけです | 0 |
+| `--best` | 遅い試行を 1 つ加えます。CSO v1 と v2 には Zopfli、ZSO には総当たりの LZ4。わずかに小さく、作るのはずっと遅くなります | オフ |
+
+`KIRISUTE_FORMAT`、`KIRISUTE_BLOCK`、`KIRISUTE_LZ4_COST`、`KIRISUTE_BEST` で同じ既定を設定できます。
+
+- コピーの名前は `game.cso` か `game.zso` で、ARK が一覧に出す拡張子です。CSO v2 も `.cso` です。`.cso2` という名前は本体に表示されません。
+- コピーは元のファイルにバイト単位で戻ると確かめてから残します。確認の間はイメージと同じ大きさの空き容量が要ります。既存のコピーは上書きしません。
+- DAX と JSO は書きません。maxcso の DAX のブロックには ARK が想定する zlib ヘッダーがなく、オープンソースの JSO ライターは存在しません。JSO の速い読み込みは ZSO で得られます。
+- 既定の設定は `maxcso --format=cso2 --block=8192 --use-zlib --use-7zdeflate --use-lz4 --use-lz4brute` と同じバイト列を書き、そのコピーは ARK-4 と ARK-5 で起動します。大きい `--lz4-cost`、`--best`、CSO v1、ZSO は ARK のリーダーが読める形式ですが、まだ本体では試していません。
+- 詰め物を消したいときは先に切り詰めてください。圧縮でもゼロの並びはほとんど場所を取りません。
 
 ## 移植性
 

@@ -30,6 +30,7 @@ ks_walk_entry() {
     return 0
   fi
   ks_rom_system "$3" || return 0
+  [ "${KS_MODE}" != compress ] || [ "${KS_SYSTEM}" = psp ] || return 0
   [ ! -f "$3" ] || ks_visit "$1" "$3"
 }
 

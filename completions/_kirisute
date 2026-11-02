@@ -4,6 +4,7 @@ _kirisute() {
   local -a commands
   commands=(
     'rename:rename each ROM after its header'
+    'compress:write a compressed copy of each PSP disc image'
     'doctor:check the tools kirisute needs'
     'version:print the version'
     'help:print usage'
@@ -23,6 +24,10 @@ _kirisute() {
     '--no-backup[keep no copy of the original]' \
     '--recursive[look for ROM files in every subfolder too]' \
     '--json[print the result as one JSON object, for scripts]' \
+    '--format[compressed format, default cso2]:format:(cso cso2 zso)' \
+    '--block[block size in bytes, default 8192]:bytes:(2048 4096 8192 16384)' \
+    '--lz4-cost[percent a CSO v2 block may grow to use LZ4, default 0]:percent:' \
+    '--best[one more slow trial: Zopfli for CSO, brute-force LZ4 for ZSO]' \
     '*:rom:_files -g "*.(nds|NDS|gba|GBA|3ds|3DS|cci|CCI|cxi|CXI|iso|ISO)(-.)" -g "*(-/)"'
 }
 

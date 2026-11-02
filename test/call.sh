@@ -25,6 +25,8 @@ KS_LIB="$(cd "$(dirname "$0")/../lib" && pwd)" || exit 1
 . "${KS_LIB}/trim.sh"
 # shellcheck source=SCRIPTDIR/../lib/rename.sh
 . "${KS_LIB}/rename.sh"
+# shellcheck source=SCRIPTDIR/../lib/compress.sh
+. "${KS_LIB}/compress.sh"
 
 call_cleanup() {
   KS_TMP="$1"

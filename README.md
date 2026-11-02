@@ -14,6 +14,7 @@ English | [日本語](README.ja.md) | [简体中文](README.zh-Hans.md) | [繁�
   <a href="#quick-start"><strong>Quick start</strong></a> |
   <a href="#what-is-kept">What is kept</a> |
   <a href="#rename">Rename</a> |
+  <a href="#compress">Compress</a> |
   <a href="#development">Development</a>
 </p>
 
@@ -50,6 +51,8 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 |:-----|:----|:--------|
 | `awk`, `od`, `head`, `tail`, `tr`, `wc` | Read the header and copy the ROM's data | Part of every Linux and macOS system |
 | `mktemp`, `mv`, `stat`, `chmod`, `rm` | Write the trimmed copy beside the ROM and swap it in | Part of every Linux and macOS system |
+| `cmp` | Check that a compressed copy decompresses to the original | Part of every Linux and macOS system |
+| [maxcso](https://github.com/unknownbrackets/maxcso) | Write CSO and ZSO copies for `compress` | `brew install gufranco/tap/maxcso`; the Homebrew formula pulls it in |
 
 ### Install
 
@@ -82,6 +85,8 @@ mv                 ok       /bin/mv, bsd
 stat               ok       /usr/bin/stat, bsd
 chmod              ok       /bin/chmod, bsd
 rm                 ok       /bin/rm, bsd
+cmp                ok       /opt/homebrew/bin/cmp, gnu 3.12
+maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 ```
 
 ## Usage
@@ -90,6 +95,7 @@ rm                 ok       /bin/rm, bsd
 |:--------|:--------|
 | `kirisute [options] <rom>...` | Trim each ROM file, and the ROM files of each folder given |
 | `kirisute rename [options] <rom>...` | Rename each ROM after the title and code in its header |
+| `kirisute compress [options] <iso>...` | Write a CSO or ZSO copy of each PSP disc image for ARK-4 and ARK-5 |
 | `kirisute` with no arguments | Ask for a ROM file or folder, offering the current folder, when run in a terminal |
 | `kirisute doctor` | List the tools kirisute needs, with the flavor and version of each |
 | `kirisute version`, `kirisute help` | Print the version or the full usage page |
@@ -110,6 +116,7 @@ kirisute --dry-run *.nds *.3ds           # see what trimming would save
 kirisute --backup --verify game.nds      # keep the original, refuse if the padding holds data
 kirisute --recursive ~/roms              # trim a whole library
 kirisute rename --dry-run *.gba          # see the name each ROM would take
+kirisute compress game.iso               # write game.cso for ARK-4 and ARK-5
 ```
 
 <a id="what-is-kept"></a>
@@ -157,6 +164,42 @@ Dry run: 4 ROMs would be renamed. Nothing was changed.
 - The extension is kept in lowercase. Slashes and colons in a title become hyphens, and control characters are dropped.
 - A name another file already has is never taken: that ROM stays as it is with a warning. A change of letter case alone works on a Mac's disk too.
 - `rename` takes `--dry-run`, `--recursive` and `--json`.
+
+<a id="compress"></a>
+
+## Compress
+
+`kirisute compress` writes a compressed copy of each PSP disc image with [maxcso](https://github.com/unknownbrackets/maxcso), in a format the ARK-4 and ARK-5 custom firmware read, and keeps the original:
+
+```console
+$ kirisute compress --dry-run umd.iso
+
+Files:  1 ROM, 100.0 MiB
+Plan:   compress each PSP disc image to CSO v2 in 8 KiB blocks
+        use LZ4 only where it is smaller than deflate
+        keep each original and check that each copy decompresses to it
+        dry run: list each copy and change nothing
+
+Would compress umd.iso to umd.cso as CSO v2.
+Dry run: 1 ROM would be compressed. Nothing was changed.
+```
+
+| Option | Effect | Default |
+|:-------|:-------|:--------|
+| `--format cso` | CSO v1: deflate only, the format older firmware reads, slowest of the three to load | |
+| `--format cso2` | CSO v2: deflate or LZ4 for each block, small and quicker to read | yes |
+| `--format zso` | ZSO: LZ4 only, the fastest to read, a larger file | |
+| `--block N` | Block size: 2048, 4096, 8192 or 16384 bytes. Larger blocks compress a little better | 8192 |
+| `--lz4-cost N` | For CSO v2, use LZ4 for a block when it costs at most N% more space, trading space for read speed; 0 uses LZ4 only where it is smaller | 0 |
+| `--best` | Add one more slow trial, Zopfli for CSO v1 and v2 or brute-force LZ4 for ZSO: a slightly smaller copy, much slower to make | off |
+
+`KIRISUTE_FORMAT`, `KIRISUTE_BLOCK`, `KIRISUTE_LZ4_COST` and `KIRISUTE_BEST` set the same defaults.
+
+- A copy is named `game.cso` or `game.zso`, the extensions ARK lists. A CSO v2 file is a `.cso` too; a `.cso2` name never shows on the console.
+- A copy is kept only after it decompresses back to the original byte for byte, which needs free space as large as the image while the check runs. An existing copy is never overwritten.
+- DAX and JSO are not written. maxcso's DAX blocks lack the zlib header ARK expects, and no open-source JSO writer exists. ZSO covers JSO's fast reads.
+- The defaults write the same bytes as `maxcso --format=cso2 --block=8192 --use-zlib --use-7zdeflate --use-lz4 --use-lz4brute`, whose copies boot on ARK-4 and ARK-5. A higher `--lz4-cost`, `--best`, CSO v1 and ZSO are formats the ARK reader decodes, but they have not been tried on a console yet.
+- Trim an image first if you want its padding gone; compression already stores runs of zeros in almost no space.
 
 ## Portability
 

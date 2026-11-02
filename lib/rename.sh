@@ -3,21 +3,6 @@
 # shellcheck source=SCRIPTDIR/state.sh
 . "${KS_LIB:?}/state.sh"
 
-ks_rename_options() {
-  if [ "${KS_INFO}" = yes ]; then
-    ks_cli_hint "--info does not apply to rename"
-    return 1
-  fi
-  if [ -n "${KS_VERIFY}" ]; then
-    ks_cli_hint "--verify and --no-verify do not apply to rename"
-    return 1
-  fi
-  if [ -n "${KS_BACKUP}" ]; then
-    ks_cli_hint "--backup and --no-backup do not apply to rename"
-    return 1
-  fi
-}
-
 ks_rename_clean() {
   printf '%s' "$1" | tr '/:' '--' | tr -d '\000-\037\177' | tr -s ' '
 }

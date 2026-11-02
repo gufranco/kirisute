@@ -69,6 +69,17 @@ teardown() {
   [[ "${output}" == "KIRISUTE (KSTE).nds" ]]
 }
 
+@test "a path that starts with a hyphen reaches maxcso as a relative path" {
+  # Arrange
+  local path="-game.iso"
+
+  # Act
+  run ks_test_call ks_compress_path "${path}"
+
+  # Assert
+  [[ "${output}" == "./-game.iso" ]]
+}
+
 @test "the cleanup removes the temporary file once and then does nothing" {
   # Arrange
   local temporary="${WORK}/.kirisute.test"

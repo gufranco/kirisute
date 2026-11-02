@@ -15,6 +15,8 @@ docker run --rm \
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq >/dev/null
     apt-get install -y -qq --no-install-recommends \
-      bats dash zsh mandoc file python3 ca-certificates >/dev/null
+      bats dash zsh mandoc file python3 ca-certificates curl \
+      build-essential pkgconf zlib1g-dev liblz4-dev libuv1-dev >/dev/null
+    sh .github/scripts/maxcso.sh /usr/local
     exec "$@"
   ' sh "$@"

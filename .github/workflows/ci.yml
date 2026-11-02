@@ -138,8 +138,12 @@ jobs:
           mkdir -p "${HOME}/apt-archives/partial"
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o Dir::Cache::Archives="${HOME}/apt-archives" -o APT::Sandbox::User=root \
-            bats dash zsh mandoc parallel "${extra[@]}"
+            bats dash zsh mandoc parallel build-essential pkgconf zlib1g-dev liblz4-dev libuv1-dev "${extra[@]}"
           sudo chown -R "$(id -u):$(id -g)" "${HOME}/apt-archives"
+      - name: Build maxcso
+        run: |
+          sh .github/scripts/maxcso.sh "${RUNNER_TEMP}/maxcso"
+          echo "${RUNNER_TEMP}/maxcso/bin" >> "${GITHUB_PATH}"
       - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f  # v1.335.0
         if: matrix.coverage
         with:
@@ -195,7 +199,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Install shells and tools
-        run: brew install --formula bats-core bash dash-shell zsh parallel
+        run: brew install --formula bats-core bash dash-shell zsh parallel lz4 libuv pkgconf
+      - name: Build maxcso
+        run: |
+          sh .github/scripts/maxcso.sh "${RUNNER_TEMP}/maxcso"
+          echo "${RUNNER_TEMP}/maxcso/bin" >> "${GITHUB_PATH}"
       - name: Install the Homebrew toolset
         if: matrix.toolset == 'homebrew'
         run: brew install --formula coreutils findutils gnu-sed gawk grep diffutils

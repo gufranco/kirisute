@@ -14,6 +14,7 @@
   <a href="#quick-start"><strong>快速開始</strong></a> |
   <a href="#what-is-kept">保留甚麼</a> |
   <a href="#rename">重新命名</a> |
+  <a href="#compress">壓縮</a> |
   <a href="#development">開發</a>
 </p>
 
@@ -50,6 +51,8 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 |:-----|:-----|:-----|
 | `awk`、`od`、`head`、`tail`、`tr`、`wc` | 讀取標頭並複製 ROM 的資料 | Linux 和 macOS 已預載 |
 | `mktemp`、`mv`、`stat`、`chmod`、`rm` | 在 ROM 旁寫入剪裁後的副本並替換 | Linux 和 macOS 已預載 |
+| `cmp` | 檢查壓縮副本能否解壓回原檔 | Linux 和 macOS 已預載 |
+| [maxcso](https://github.com/unknownbrackets/maxcso) | 為 `compress` 寫出 CSO 和 ZSO 副本 | `brew install gufranco/tap/maxcso`；Homebrew formula 會一併安裝 |
 
 ### 安裝
 
@@ -82,6 +85,8 @@ mv                 ok       /bin/mv, bsd
 stat               ok       /usr/bin/stat, bsd
 chmod              ok       /bin/chmod, bsd
 rm                 ok       /bin/rm, bsd
+cmp                ok       /opt/homebrew/bin/cmp, gnu 3.12
+maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 ```
 
 ## 用法
@@ -90,6 +95,7 @@ rm                 ok       /bin/rm, bsd
 |:-----|:-----|
 | `kirisute [options] <rom>...` | 剪裁每個 ROM 檔案，以及所給資料夾內的 ROM 檔案 |
 | `kirisute rename [options] <rom>...` | 按標頭中的標題和代碼重新命名每個 ROM |
+| `kirisute compress [options] <iso>...` | 為 ARK-4 和 ARK-5 寫出每個 PSP 光碟映像的 CSO 或 ZSO 副本 |
 | 不帶參數的 `kirisute` | 在終端機中執行時詢問 ROM 檔案或資料夾，預設為目前的資料夾 |
 | `kirisute doctor` | 列出所需的工具及各自的種類與版本 |
 | `kirisute version`、`kirisute help` | 顯示版本或完整的用法說明 |
@@ -110,6 +116,7 @@ kirisute --dry-run *.nds *.3ds           # 看看剪裁能節省多少
 kirisute --backup --verify game.nds      # 保留原檔，填充資料中有內容便拒絕
 kirisute --recursive ~/roms              # 剪裁整個遊戲庫
 kirisute rename --dry-run *.gba          # 看看每個 ROM 會取甚麼名稱
+kirisute compress game.iso               # 為 ARK-4 和 ARK-5 寫出 game.cso
 ```
 
 <a id="what-is-kept"></a>
@@ -157,6 +164,42 @@ Dry run: 4 ROMs would be renamed. Nothing was changed.
 - 副檔名保持小寫。標題中的斜線和冒號會變成連字號，控制字元會被刪去。
 - 絕不會佔用其他檔案已有的名稱：那個 ROM 會保持原狀並發出警告。只改變大小寫的重新命名在 Mac 的磁碟上亦能完成。
 - `rename` 接受 `--dry-run`、`--recursive` 和 `--json`。
+
+<a id="compress"></a>
+
+## 壓縮
+
+`kirisute compress` 以 [maxcso](https://github.com/unknownbrackets/maxcso) 為每個 PSP 光碟映像寫出壓縮副本，格式可由自製韌體 ARK-4 和 ARK-5 讀取，並保留原檔：
+
+```console
+$ kirisute compress --dry-run umd.iso
+
+Files:  1 ROM, 100.0 MiB
+Plan:   compress each PSP disc image to CSO v2 in 8 KiB blocks
+        use LZ4 only where it is smaller than deflate
+        keep each original and check that each copy decompresses to it
+        dry run: list each copy and change nothing
+
+Would compress umd.iso to umd.cso as CSO v2.
+Dry run: 1 ROM would be compressed. Nothing was changed.
+```
+
+| 選項 | 作用 | 預設 |
+|:-----|:-----|:-----|
+| `--format cso` | CSO v1：只用 deflate，較舊的韌體亦能讀取，三者中載入最慢 | |
+| `--format cso2` | CSO v2：每個區塊選用 deflate 或 LZ4，體積細，讀取亦較快 | 是 |
+| `--format zso` | ZSO：只用 LZ4，讀取最快，檔案較大 | |
+| `--block N` | 區塊大小：2048、4096、8192 或 16384 位元組。區塊越大壓縮得稍好 | 8192 |
+| `--lz4-cost N` | 對 CSO v2，當 LZ4 最多多佔 N% 空間時便用 LZ4，以空間換讀取速度；0 即只在 LZ4 較細時使用 | 0 |
+| `--best` | 多加一次慢速嘗試：CSO v1 和 v2 用 Zopfli，ZSO 用暴力 LZ4。副本略細，但製作慢得多 | 關 |
+
+`KIRISUTE_FORMAT`、`KIRISUTE_BLOCK`、`KIRISUTE_LZ4_COST` 和 `KIRISUTE_BEST` 可設定同樣的預設值。
+
+- 副本命名為 `game.cso` 或 `game.zso`，即 ARK 會列出的副檔名。CSO v2 檔案亦是 `.cso`；`.cso2` 的名稱不會在主機上顯示。
+- 副本只有在逐位元組解壓回原檔後才會保留，檢查期間需要與映像同樣大小的可用空間。已有的副本絕不會被覆蓋。
+- 不寫出 DAX 和 JSO。maxcso 的 DAX 區塊缺少 ARK 預期的 zlib 標頭，而開源的 JSO 寫入工具並不存在。ZSO 能提供 JSO 的快速讀取。
+- 預設設定寫出的位元組與 `maxcso --format=cso2 --block=8192 --use-zlib --use-7zdeflate --use-lz4 --use-lz4brute` 完全相同，其副本能在 ARK-4 和 ARK-5 上開機。較大的 `--lz4-cost`、`--best`、CSO v1 和 ZSO 是 ARK 讀取器能解碼的格式，但仍未在主機上試過。
+- 想去掉填充資料便先剪裁；壓縮本身亦幾乎不為連續的零佔空間。
 
 ## 可攜性
 

@@ -40,6 +40,8 @@ KS_LIB="$(cd "${ks_self%/*}/../lib" && pwd)" || exit 1
 . "${KS_LIB}/process.sh"
 # shellcheck source=SCRIPTDIR/../lib/rename.sh
 . "${KS_LIB}/rename.sh"
+# shellcheck source=SCRIPTDIR/../lib/compress.sh
+. "${KS_LIB}/compress.sh"
 # shellcheck source=SCRIPTDIR/../lib/run.sh
 . "${KS_LIB}/run.sh"
 
@@ -48,9 +50,9 @@ ks_main() {
   help | -h | --help) ks_usage ;;
   version | -V | --version) ks_cli_version ;;
   doctor) ks_doctor ;;
-  rename)
+  rename | compress)
+    KS_MODE="$1"
     shift
-    KS_RENAME=yes
     ks_start "$@"
     ;;
   *) ks_start "$@" ;;
