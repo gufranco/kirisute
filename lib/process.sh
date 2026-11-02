@@ -14,6 +14,10 @@ ks_record() {
     ks_rc_reason="$(ks_json_string "$2")"
     ks_rc_item="${ks_rc_item},\"reason\":${ks_rc_reason}"
   fi
+  if [ -n "${KS_NEW_NAME}" ]; then
+    ks_rc_name="$(ks_json_string "${KS_NEW_NAME}")"
+    ks_rc_item="${ks_rc_item},\"new_name\":${ks_rc_name}"
+  fi
   if [ "$1" = info ]; then
     ks_rc_title="$(ks_json_string "${KS_ROM_TITLE}")"
     ks_rc_code="$(ks_json_string "${KS_ROM_CODE}")"
@@ -80,7 +84,12 @@ ks_cut() {
 ks_process() {
   KS_ROM_KIND=""
   KS_ROM_TARGET=0
+  KS_NEW_NAME=""
   ks_rom_read "$1"
+  if [ "${KS_RENAME}" = yes ]; then
+    ks_rename_process "$1"
+    return 0
+  fi
   if ! ks_check "$1"; then
     ks_skip "$1" "${KS_REASON}"
     return 0

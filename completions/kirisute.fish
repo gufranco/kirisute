@@ -1,3 +1,4 @@
+complete -c kirisute -n __fish_use_subcommand -a rename -d 'rename each ROM after its header'
 complete -c kirisute -n __fish_use_subcommand -a doctor -d 'check the tools kirisute needs'
 complete -c kirisute -n __fish_use_subcommand -a version -d 'print the version'
 complete -c kirisute -n __fish_use_subcommand -a help -d 'print usage'

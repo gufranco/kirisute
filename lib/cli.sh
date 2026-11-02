@@ -11,6 +11,9 @@ usage:
   kirisute                      ask for a ROM file or folder, then trim it
   kirisute [options] <rom>...   trim each ROM file, and the ROM files of each
                                 folder given
+  kirisute rename [options] <rom>...
+                                rename each ROM after the title and code in
+                                its header, such as KIRISUTE (KSTE).nds
   kirisute doctor               check the tools kirisute needs
   kirisute version              print the version
   kirisute help                 print this page
@@ -41,13 +44,16 @@ notes:
   fails its checks, or declares more than the file holds, stays as it is.
   Each ROM is written to a temporary file beside it and renamed over it, so an
   interrupted run never leaves half a file. Symbolic links, hidden files and
-  hidden folders are left alone. -- ends the options, and a file named help,
-  doctor or version is trimmed by giving its path, such as ./help.
+  hidden folders are left alone. rename takes --dry-run, --recursive and
+  --json, keeps the extension in lowercase, and never takes a name another
+  file has. -- ends the options, and a file named help, doctor, version or
+  rename is trimmed by giving its path, such as ./help.
 
 examples:
   kirisute --dry-run *.nds *.3ds
   kirisute --backup --verify game.nds
   kirisute --recursive ~/roms
+  kirisute rename --dry-run *.gba
 USAGE
 }
 

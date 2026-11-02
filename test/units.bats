@@ -58,6 +58,17 @@ teardown() {
   [[ "${output}" == "." ]]
 }
 
+@test "a bare file name is renamed in the current folder" {
+  # Arrange
+  local path="game.NDS"
+
+  # Act
+  run ks_test_call ks_rename_target "${path}" "KIRISUTE (KSTE)"
+
+  # Assert
+  [[ "${output}" == "KIRISUTE (KSTE).nds" ]]
+}
+
 @test "the cleanup removes the temporary file once and then does nothing" {
   # Arrange
   local temporary="${WORK}/.kirisute.test"

@@ -10,7 +10,7 @@ _kirisute() {
   fi
   words="$(compgen -f -- "${cur}" || true)"
   if [[ "${COMP_CWORD}" -eq 1 ]]; then
-    words="doctor version help ${words}"
+    words="rename doctor version help ${words}"
   fi
   COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
 }

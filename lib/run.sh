@@ -21,6 +21,11 @@ ks_summary() {
   ks_su_roms="$(ks_plural "${KS_FOUND}" ROM)"
   ks_su_size="$(ks_human "${KS_BYTES}")"
   printf '\nFiles:  %s, %s\n' "${ks_su_roms}" "${ks_su_size}"
+  if [ "${KS_RENAME}" = yes ]; then
+    ks_rename_plan
+    printf '\n'
+    return 0
+  fi
   printf 'Plan:   cut each ROM to the size its header declares\n'
   [ "${KS_BACKUP}" = no ] || printf '        keep each original as <rom>.bak\n'
   [ "${KS_VERIFY}" = no ] || printf '        trim only a ROM whose padding is nothing but 00 or FF\n'
@@ -33,6 +38,11 @@ ks_report_json() {
   [ "${KS_DRY_RUN}" = no ] || ks_rj_dry=true
   ks_rj_info=false
   [ "${KS_INFO}" = no ] || ks_rj_info=true
+  if [ "${KS_RENAME}" = yes ]; then
+    printf '{"dry_run":%s,"roms":%s,"renamed":%s,"already":%s,"skipped":%s,"failed":%s,"files":[%s]}\n' \
+      "${ks_rj_dry}" "${KS_FOUND}" "${KS_DONE}" "${KS_ALREADY}" "${KS_SKIPPED}" "${KS_FAILED}" "${KS_RESULTS}"
+    return 0
+  fi
   printf '{"dry_run":%s,"info":%s,"roms":%s,"read":%s,"trimmed":%s,"already":%s,"skipped":%s,"failed":%s,"saved":%s,"files":[%s]}\n' \
     "${ks_rj_dry}" "${ks_rj_info}" "${KS_FOUND}" "${KS_READ}" "${KS_DONE}" "${KS_ALREADY}" "${KS_SKIPPED}" "${KS_FAILED}" "${KS_SAVED}" "${KS_RESULTS}"
 }
@@ -68,6 +78,8 @@ ks_report_text() {
 ks_report() {
   if [ "${KS_JSON}" = yes ]; then
     ks_report_json
+  elif [ "${KS_RENAME}" = yes ]; then
+    ks_rename_report
   else
     ks_report_text
   fi
@@ -76,6 +88,7 @@ ks_report() {
 
 ks_start() {
   ks_args_parse "$@" || return 1
+  [ "${KS_RENAME}" = no ] || ks_rename_options || return 1
   ks_args_settings || return 1
   if [ "${KS_INPUTS}" -eq 0 ]; then
     ks_ask || return 1

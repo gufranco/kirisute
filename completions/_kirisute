@@ -3,6 +3,7 @@
 _kirisute() {
   local -a commands
   commands=(
+    'rename:rename each ROM after its header'
     'doctor:check the tools kirisute needs'
     'version:print the version'
     'help:print usage'

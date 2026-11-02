@@ -9,7 +9,7 @@ Guidance for anyone, human or agent, changing kirisute. What kirisute is and how
 | Path | Holds |
 |:-----|:------|
 | [`bin/kirisute`](bin/kirisute) | The entry point: it clears inherited `KS_` variables, sources the modules and dispatches the command |
-| [`lib/`](lib) | The modules. [`lib/state.sh`](lib/state.sh) declares every global, including each system's constants; [`lib/rom.sh`](lib/rom.sh) picks a ROM's system and calls that system's functions, [`lib/nds.sh`](lib/nds.sh) is the Nintendo DS and DSi system, [`lib/gba.sh`](lib/gba.sh) the Game Boy Advance one, [`lib/3ds.sh`](lib/3ds.sh) the 3DS cartridge image one, [`lib/cxi.sh`](lib/cxi.sh) the 3DS executable one and [`lib/psp.sh`](lib/psp.sh) the PSP ISO one, [`lib/trim.sh`](lib/trim.sh) writes and swaps the trimmed copy, [`lib/walk.sh`](lib/walk.sh) finds the ROMs and [`lib/process.sh`](lib/process.sh) decides what happens to each |
+| [`lib/`](lib) | The modules. [`lib/state.sh`](lib/state.sh) declares every global, including each system's constants; [`lib/rom.sh`](lib/rom.sh) picks a ROM's system and calls that system's functions, [`lib/nds.sh`](lib/nds.sh) is the Nintendo DS and DSi system, [`lib/gba.sh`](lib/gba.sh) the Game Boy Advance one, [`lib/3ds.sh`](lib/3ds.sh) the 3DS cartridge image one, [`lib/cxi.sh`](lib/cxi.sh) the 3DS executable one and [`lib/psp.sh`](lib/psp.sh) the PSP ISO one, [`lib/trim.sh`](lib/trim.sh) writes and swaps the trimmed copy, [`lib/walk.sh`](lib/walk.sh) finds the ROMs, [`lib/process.sh`](lib/process.sh) decides what happens to each and [`lib/rename.sh`](lib/rename.sh) holds the `rename` command |
 | [`man/kirisute.1`](man/kirisute.1) | The man page |
 | [`completions/`](completions) | bash, zsh and fish completions |
 | [`test/`](test) | The `bats` suite, its helpers, the byte helpers [`test/bytes.bash`](test/bytes.bash) and one ROM builder per system, such as [`test/rom.bash`](test/rom.bash) for DS, [`test/gba.bash`](test/gba.bash), [`test/ctr.bash`](test/ctr.bash) for 3DS and [`test/psp.bash`](test/psp.bash), the golden transcripts, the shell matrix runner and the Linux container script |
@@ -24,7 +24,8 @@ Guidance for anyone, human or agent, changing kirisute. What kirisute is and how
 
 ## Behaviour
 
-- kirisute has one job, so a bare `kirisute` on a terminal asks for a ROM file or folder directly, offering the current folder.
+- Trimming is the default job, so a bare `kirisute` on a terminal asks for a ROM file or folder directly, offering the current folder, as does a bare `kirisute rename`.
+- `kirisute rename` names each ROM `<title> (<code>).<ext>` from its header, or `<code>.<ext>` when the header has no title. It takes `--dry-run`, `--recursive` and `--json`, and refuses `--info`, `--verify` and `--backup` with the usage hint. It never takes a name another file has, and a rename that only changes letter case goes through a temporary name, since the Mac's disk ignores case. Its JSON report counts `renamed` instead of `trimmed`, drops `info`, `read` and `saved`, and gives each file its `new_name`.
 - Its options are `--dry-run`, `--info`, `--verify` and `--no-verify`, `--backup` and `--no-backup`, `--recursive` and `--json`, so the help page has a single `options:` section. `--json` reports the counts of ROMs found, read, trimmed, already trimmed, skipped and failed, the bytes saved, and one entry per file.
 - Trimming drops only bytes past what the header declares, so it shows its summary block and starts without a typed confirmation, as shiwake does.
 - A skipped or failed ROM makes the run end with status 1, and the other ROMs are still trimmed.
