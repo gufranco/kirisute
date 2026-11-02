@@ -124,10 +124,12 @@ kirisute rename --dry-run *.gba          # see the name each ROM would take
 | Game Boy Advance | `.gba` | Its last byte that is not padding, rounded up to 4 bytes, when that saves at least 512 bytes |
 | 3DS cartridge image | `.3ds`, `.cci` | The end of its last partition, in the media unit its header sets |
 | 3DS executable | `.cxi` | The size its NCCH header declares |
-| PSP disc image | `.iso` | The volume its ISO 9660 descriptor declares |
+| PSP disc image | `.iso` | The volume its ISO 9660 descriptor declares, only when everything past it is `00` or `FF` |
 
-- Each file is checked before it is touched. A DS or Game Boy Advance ROM needs a correct logo and header checksum; a 3DS image needs the NCSD magic, a media ID and partitions in order, and a console NAND image is refused; a PSP image needs a `PSP_GAME` folder. A file that fails, that is too small for a header, or whose header declares more than the file holds, stays as it is with a warning, and the run ends with status 1.
+- Each file is checked before it is touched. A DS or Game Boy Advance ROM needs a correct logo and header checksum; a 3DS image needs the NCSD magic, a media ID and partitions in order, and a console NAND image is refused; a PSP image needs the system name `PSP GAME`, `UMD VIDEO` or `UMD AUDIO`, or a `PSP_GAME` folder. A file that fails, that is too small for a header, or whose header declares more than the file holds, stays as it is with a warning, and the run ends with status 1.
 - Without `--verify`, the bytes past the real size are dropped whatever they hold. With it, a ROM with anything but `00` or `FF` there stays as it is, and the warning names the first such byte.
+- A PSP image always gets that check. Dumpers size an image by the disc's last sector rather than by its file system, and a game can read sectors outside its files, so kirisute never cuts data it cannot prove is padding. It never removes anything inside the volume either: update data, padding files and videos all stay. A development DVD-R image holding `USER_L0.IMG` and `USER_L1.IMG` is refused until its two layers are joined.
+- A trimmed file no longer matches the checksum of an untrimmed dump in databases such as Redump or No-Intro. `--backup` keeps the original.
 - Each trimmed ROM is written to a temporary file beside it, given the original's permissions and renamed over it, so an interrupted run never leaves half a file.
 - A folder gives only the files with the extensions above directly inside it, in any case; `--recursive` walks up to 32 folders deep. A file given by name with another extension is read as a DS ROM. Symbolic links, hidden files such as `._game.nds`, and hidden folders are left alone.
 
