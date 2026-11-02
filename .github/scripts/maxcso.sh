@@ -14,6 +14,7 @@ else
   printf '%s  %s\n' "${sum}" "${work}/maxcso.tar.gz" | shasum -a 256 -c - >/dev/null
 fi
 tar -xzf "${work}/maxcso.tar.gz" -C "${work}"
-make -C "${work}/maxcso-${version}" -j4 CFLAGS='-O2 -w' CXXFLAGS='-O2 -w' >/dev/null
+paths="$(pkg-config --cflags --libs-only-L libuv liblz4)"
+make -C "${work}/maxcso-${version}" -j4 CFLAGS="-O2 -w ${paths}" CXXFLAGS="-O2 -w ${paths}" >/dev/null
 make -C "${work}/maxcso-${version}" install PREFIX="${prefix}" >/dev/null
 test -x "${prefix}/bin/maxcso"
