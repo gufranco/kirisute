@@ -45,7 +45,7 @@ option_drift() {
 
 @test "help prints the usage page" {
   # Arrange
-  local first="kirisute - cut GBA, DS, DSi and 3DS ROM files down to their real size"
+  local first="kirisute - cut GBA, DS, DSi and 3DS ROMs and PSP ISOs to their real size"
 
   # Act
   run ks_test_run help

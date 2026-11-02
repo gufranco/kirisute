@@ -101,6 +101,10 @@ ks_test_ctr() {
   bash "${KIRISUTE_TESTS_DIR}/ctr.bash" "$@"
 }
 
+ks_test_psp() {
+  bash "${KIRISUTE_TESTS_DIR}/psp.bash" "$@"
+}
+
 ks_test_size_is() {
   local size
   size="$(wc -c <"$1")"

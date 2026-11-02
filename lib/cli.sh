@@ -5,7 +5,7 @@
 
 ks_usage() {
   cat <<'USAGE'
-kirisute - cut GBA, DS, DSi and 3DS ROM files down to their real size
+kirisute - cut GBA, DS, DSi and 3DS ROMs and PSP ISOs to their real size
 
 usage:
   kirisute                      ask for a ROM file or folder, then trim it
@@ -30,15 +30,15 @@ environment:
   KIRISUTE_BACKUP               yes or no, the default for --backup, no
 
 notes:
-  A folder gives its .gba, .nds, .3ds, .cci and .cxi files; a file given by
-  name is read by its extension, and as a DS ROM when it has none of these.
+  A folder gives its .gba, .nds, .3ds, .cci, .cxi and .iso files; a file given
+  by name is read by its extension, and as a DS ROM when it has none of these.
   Each ROM keeps everything its header declares: a DS ROM its download-play
   certificate when it has one and the DSi area of a DSi ROM, a 3DS cartridge
-  image every partition, and a 3DS executable its declared size. A Game Boy
-  Advance ROM declares no size, so it is cut after its last byte that is not
-  padding, on a 4-byte boundary, when that saves at least 512 bytes. A file
-  whose header fails its checks, or declares more than the file holds, stays
-  as it is.
+  image every partition, a 3DS executable its declared size, and a PSP ISO
+  the volume its ISO 9660 descriptor declares. A Game Boy Advance ROM
+  declares no size, so it is cut after its last byte that is not padding, on
+  a 4-byte boundary, when that saves at least 512 bytes. A file whose header
+  fails its checks, or declares more than the file holds, stays as it is.
   Each ROM is written to a temporary file beside it and renamed over it, so an
   interrupted run never leaves half a file. Symbolic links, hidden files and
   hidden folders are left alone. -- ends the options, and a file named help,
