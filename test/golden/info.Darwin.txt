@@ -1,0 +1,30 @@
+kirisute: warning: WORK/library/broken.nds has a bad header checksum, so it stays as it is.
+File:   WORK/library/download-play.nds, 64.0 KiB
+Title:  KIRISUTE
+Code:   KSTE
+Unit:   0x00, NTR, DS
+Cert:   yes, download play
+Trim:   16.1 KiB, 47.9 KiB of padding
+
+File:   WORK/library/dsi.nds, 64.0 KiB
+Title:  KIRISUTE
+Code:   KSTE
+Unit:   0x02, NTR and TWL, DSi enhanced
+Cert:   none
+Trim:   32.0 KiB, 32.0 KiB of padding
+
+File:   WORK/library/plain.nds, 64.0 KiB
+Title:  KIRISUTE
+Code:   KSTE
+Unit:   0x00, NTR, DS
+Cert:   none
+Trim:   16.0 KiB, 48.0 KiB of padding
+
+File:   WORK/library/trimmed.nds, 16.0 KiB
+Title:  KIRISUTE
+Code:   KSTE
+Unit:   0x00, NTR, DS
+Cert:   none
+Trim:   16.0 KiB, 0 bytes of padding
+
+Read 4 of 5 ROMs.

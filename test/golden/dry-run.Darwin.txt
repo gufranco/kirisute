@@ -1,0 +1,12 @@
+
+Files:  5 ROMs, 272.0 KiB
+Plan:   cut each ROM to the size its header declares
+        trim only a ROM whose padding is nothing but 00 or FF
+        dry run: list each cut and change nothing
+
+kirisute: warning: WORK/library/broken.nds has a bad header checksum, so it stays as it is.
+Would trim WORK/library/download-play.nds from 64.0 KiB to 16.1 KiB, keeping its download-play certificate.
+Would trim WORK/library/dsi.nds from 64.0 KiB to 32.0 KiB, keeping its DSi area.
+Would trim WORK/library/plain.nds from 64.0 KiB to 16.0 KiB.
+WORK/library/trimmed.nds is already at its real size, 16.0 KiB.
+Dry run: 3 of 5 ROMs would be trimmed, saving 127.9 KiB. Nothing was changed.

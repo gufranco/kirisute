@@ -1,0 +1,43 @@
+#!/bin/sh
+[ -n "${ZSH_VERSION:-}" ] && emulate sh
+
+for ks_inherited in $(env | sed -n 's/^\(KS_[A-Za-z0-9_]*\)=.*/\1/p'); do
+  unset "${ks_inherited}"
+done
+
+ks_self="$0"
+case "${ks_self}" in
+*/*) ;;
+*) ks_self="$(command -v -- "${ks_self}")" ;;
+esac
+KS_LIB="$(cd "${ks_self%/*}/../lib" && pwd)" || exit 1
+
+# shellcheck source=SCRIPTDIR/../lib/core.sh
+. "${KS_LIB}/core.sh"
+# shellcheck source=SCRIPTDIR/../lib/cli.sh
+. "${KS_LIB}/cli.sh"
+# shellcheck source=SCRIPTDIR/../lib/doctor.sh
+. "${KS_LIB}/doctor.sh"
+# shellcheck source=SCRIPTDIR/../lib/args.sh
+. "${KS_LIB}/args.sh"
+# shellcheck source=SCRIPTDIR/../lib/rom.sh
+. "${KS_LIB}/rom.sh"
+# shellcheck source=SCRIPTDIR/../lib/trim.sh
+. "${KS_LIB}/trim.sh"
+# shellcheck source=SCRIPTDIR/../lib/walk.sh
+. "${KS_LIB}/walk.sh"
+# shellcheck source=SCRIPTDIR/../lib/process.sh
+. "${KS_LIB}/process.sh"
+# shellcheck source=SCRIPTDIR/../lib/run.sh
+. "${KS_LIB}/run.sh"
+
+ks_main() {
+  case "${1:-}" in
+  help | -h | --help) ks_usage ;;
+  version | -V | --version) ks_cli_version ;;
+  doctor) ks_doctor ;;
+  *) ks_start "$@" ;;
+  esac
+}
+
+ks_main "$@"

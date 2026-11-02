@@ -1,0 +1,110 @@
+.TH KIRISUTE 1 "2026-11-02" "kirisute" "User Commands"
+.SH NAME
+kirisute \- cut Nintendo DS and DSi ROM files down to their real size
+.SH SYNOPSIS
+.B kirisute
+.br
+.B kirisute
+.RI [ options ] " " rom ...
+.br
+.B kirisute doctor
+.br
+.B kirisute version
+.br
+.B kirisute help
+.SH DESCRIPTION
+.B kirisute
+removes the padding at the end of Nintendo DS and DSi ROM files. Each ROM is
+cut to the size its header declares: the used ROM size for a DS ROM, plus its
+download-play RSA certificate when it has one, and the full DSi area for a
+DSi-enhanced or DSi-only ROM, as GodMode9 trims them.
+.PP
+A ROM given as a file is trimmed whatever its name. A folder gives the
+.I .nds
+files directly inside it, and every subfolder too with
+.BR \-\-recursive .
+Symbolic links, hidden files and hidden folders are left alone, and
+.B kirisute
+looks no deeper than 32 folders.
+.PP
+A file whose logo or header checksum is wrong, that is too small to hold a
+header, or whose header declares more than the file holds, stays as it is with
+a warning. Each trimmed ROM is written to a temporary file beside it, given the
+original's permissions and renamed over it, so an interrupted run never leaves
+half a file.
+.PP
+Before a trim,
+.B kirisute
+prints how many ROMs it found and what it is about to do. Without a ROM on a
+terminal it asks for a file or folder, offering the current folder.
+.SH COMMANDS
+.TP
+.B doctor
+List the tools kirisute needs, with the flavor and version of each. Exits
+non-zero only when one is missing.
+.TP
+.B version
+Print the version and the platform.
+.TP
+.B help
+Print the usage page.
+.SH OPTIONS
+.TP
+.B \-\-dry\-run
+List what would be trimmed and change nothing.
+.TP
+.B \-\-info
+Print each ROM's header and change nothing: its title, game code, unit code,
+download-play certificate, trimmed size and padding.
+.TP
+.BR \-\-verify ", " \-\-no\-verify
+Trim only a ROM whose padding holds nothing but 00 or FF bytes. A ROM with any
+other byte past its real size stays as it is, and the warning names the first
+such byte.
+.TP
+.BR \-\-backup ", " \-\-no\-backup
+Keep each original as
+.IR rom .bak.
+A ROM that already has one stays as it is.
+.TP
+.B \-\-recursive
+Look for
+.I .nds
+files in every subfolder of each folder given.
+.TP
+.B \-\-json
+Print the result as one JSON object on stdout, for scripts: the counts of ROMs
+found, read, trimmed, already trimmed, skipped and failed, the bytes saved, and
+one entry per file with its status, size, kind and trimmed size.
+.PP
+.B \-\-
+ends the options. A file named help, doctor or version is trimmed by giving
+its path, such as
+.IR ./help .
+.SH ENVIRONMENT
+.TP
+.B KIRISUTE_VERIFY
+yes or no, the default for
+.BR \-\-verify ,
+no unless set.
+.TP
+.B KIRISUTE_BACKUP
+yes or no, the default for
+.BR \-\-backup ,
+no unless set.
+.SH EXIT STATUS
+0 when every ROM was trimmed or already at its real size. 1 when a file was
+skipped or could not be trimmed, or the arguments are wrong.
+.SH EXAMPLES
+.TP
+.B kirisute \-\-dry\-run *.nds
+Show what trimming every ROM in the current folder would do.
+.TP
+.B kirisute \-\-backup \-\-verify game.nds
+Trim one ROM, keep the original, and refuse if the padding holds data.
+.TP
+.B kirisute \-\-recursive ~/roms/nds
+Trim every ROM under a folder.
+.SH SEE ALSO
+.BR head (1),
+.BR od (1)
