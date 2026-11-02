@@ -3,7 +3,7 @@
 # shellcheck source=SCRIPTDIR/state.sh
 . "${KS_LIB:?}/state.sh"
 
-KIRISUTE_VERSION="1.0.0"
+KIRISUTE_VERSION="1.1.0"
 
 ks_version() {
   printf '%s %s\n' "${KS_PROG}" "${KIRISUTE_VERSION}"

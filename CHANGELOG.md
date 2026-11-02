@@ -1,5 +1,23 @@
 # Changelog
 
+# [1.1.0](https://github.com/gufranco/kirisute/compare/v1.0.0...v1.1.0) (2026-11-02)
+
+
+### Bug Fixes
+
+* **ci:** build maxcso against Homebrew libraries ([6383436](https://github.com/gufranco/kirisute/commit/638343681747d0fa470322e2175c98167c0cfb8e))
+* **ci:** gate every lib module's coverage ([cbf733f](https://github.com/gufranco/kirisute/commit/cbf733f4ff81d77d4b208e27b03e150c8e5199a4))
+* keep data past a PSP disc's declared volume ([2866b34](https://github.com/gufranco/kirisute/commit/2866b34167bd1db4933df54b2b6046f0f8040a60))
+
+
+### Features
+
+* compress PSP disc images for ARK ([918e4e9](https://github.com/gufranco/kirisute/commit/918e4e908512b65ce40c8bc14263e630c70147c9))
+* rename ROMs after their headers ([f21636f](https://github.com/gufranco/kirisute/commit/f21636ff0e447f5cf402892b993cd5c70823bc32))
+* trim 3DS cartridge images and executables ([f6f3930](https://github.com/gufranco/kirisute/commit/f6f393074b7fda9ff20e728a4876c4b9cda175a2))
+* trim Game Boy Advance ROMs ([8ac9c20](https://github.com/gufranco/kirisute/commit/8ac9c208edfbca1d1606b4380482e7e0cdde86e4))
+* trim PSP disc images ([15f269e](https://github.com/gufranco/kirisute/commit/15f269ee08c6817dd18d7ff33bc17853cd9b0421))
+
 # 1.0.0 (2026-11-02)
 
 
