@@ -8,5 +8,5 @@ complete -c kirisute -l verify -d 'trim only a ROM whose padding holds nothing b
 complete -c kirisute -l no-verify -d 'trim whatever the padding holds'
 complete -c kirisute -l backup -d 'keep each original as <rom>.bak'
 complete -c kirisute -l no-backup -d 'keep no copy of the original'
-complete -c kirisute -l recursive -d 'look for .nds files in every subfolder too'
+complete -c kirisute -l recursive -d 'look for ROM files in every subfolder too'
 complete -c kirisute -l json -d 'print the result as one JSON object, for scripts'

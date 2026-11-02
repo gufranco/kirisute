@@ -3,40 +3,13 @@
 # shellcheck source=SCRIPTDIR/state.sh
 . "${KS_LIB:?}/state.sh"
 
-ks_nds_awk_functions() {
-  printf '%s\n' '
-    function xor16(a, b,    r, bit, i) {
-      r = 0; bit = 1
-      for (i = 0; i < 16; i++) {
-        if ((int(a / bit) % 2) != (int(b / bit) % 2)) r += bit
-        bit *= 2
-      }
-      return r
-    }
-    function crc(start, count,    c, i) {
-      c = 65535
-      for (i = start; i < start + count; i++) c = xor16(int(c / 256), table[xor16(c, b[i]) % 256])
-      return c
-    }
-    function u32(at) { return b[at] + 256 * b[at + 1] + 65536 * b[at + 2] + 16777216 * b[at + 3] }
-    function text(start, count,    s, i) {
-      s = ""
-      for (i = start; i < start + count; i++) if (b[i] >= 32 && b[i] < 127) s = s sprintf("%c", b[i])
-      return s
-    }'
-}
-
 ks_nds_awk_main() {
   # shellcheck disable=SC2016
   printf '%s\n' '
     { for (i = 1; i <= NF; i++) b[n++] = $i + 0 }
     END {
       if (n < min) { printf "small 0 0 0\t\t\n"; exit }
-      for (i = 0; i < 256; i++) {
-        c = i
-        for (k = 0; k < 8; k++) c = (c % 2) ? xor16(int(c / 2), 40961) : int(c / 2)
-        table[i] = c
-      }
+      crcinit()
       status = "ok"
       if (crc(192, 156) != logo) status = "logo"
       else if (crc(0, 350) != b[350] + 256 * b[351]) status = "crc"
@@ -46,12 +19,12 @@ ks_nds_awk_main() {
 
 ks_nds_fields() {
   if [ -z "${KS_NDS_AWK}" ]; then
-    ks_nf_functions="$(ks_nds_awk_functions)"
+    ks_nf_functions="$(ks_rom_awk_functions)"
     ks_nf_main="$(ks_nds_awk_main)"
     KS_NDS_AWK="${ks_nf_functions}${ks_nf_main}"
   fi
-  od -A n -v -t u1 -N "${KS_NDS_HEADER_READ}" <"$1" |
-    awk -v min="${KS_NDS_HEADER_MIN}" -v logo="${KS_NDS_LOGO_CRC}" "${KS_NDS_AWK}"
+  ks_rom_bytes "$1" 0 "${KS_NDS_HEADER_READ}" |
+    awk -v min="${KS_NDS_HEADER_MIN}" -v logo="${KS_LOGO_CRC}" "${KS_NDS_AWK}"
 }
 
 ks_nds_read() {

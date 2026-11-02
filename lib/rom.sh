@@ -6,8 +6,50 @@
 ks_rom_system() {
   case "$1" in
   *.[nN][dD][sS]) KS_SYSTEM=nds ;;
+  *.[gG][bB][aA]) KS_SYSTEM=gba ;;
   *) return 1 ;;
   esac
+}
+
+ks_rom_awk_functions() {
+  printf '%s\n' '
+    function xor16(a, b,    r, bit, i) {
+      r = 0; bit = 1
+      for (i = 0; i < 16; i++) {
+        if ((int(a / bit) % 2) != (int(b / bit) % 2)) r += bit
+        bit *= 2
+      }
+      return r
+    }
+    function crcinit(    i, c, k) {
+      for (i = 0; i < 256; i++) {
+        c = i
+        for (k = 0; k < 8; k++) c = (c % 2) ? xor16(int(c / 2), 40961) : int(c / 2)
+        table[i] = c
+      }
+    }
+    function crc(start, count,    c, i) {
+      c = 65535
+      for (i = start; i < start + count; i++) c = xor16(int(c / 256), table[xor16(c, b[i]) % 256])
+      return c
+    }
+    function u16(at) { return b[at] + 256 * b[at + 1] }
+    function u32(at) { return b[at] + 256 * b[at + 1] + 65536 * b[at + 2] + 16777216 * b[at + 3] }
+    function hex(at, count,    s, i) {
+      s = ""
+      for (i = at + count - 1; i >= at; i--) s = s sprintf("%02X", b[i])
+      return s
+    }
+    function text(start, count,    s, i) {
+      s = ""
+      for (i = start; i < start + count; i++) if (b[i] >= 32 && b[i] < 127) s = s sprintf("%c", b[i])
+      sub(/ +$/, "", s)
+      return s
+    }'
+}
+
+ks_rom_bytes() {
+  od -A n -v -t u1 -j "$2" -N "$3" <"$1"
 }
 
 ks_rom_read() {

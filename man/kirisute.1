@@ -1,6 +1,6 @@
 .TH KIRISUTE 1 "2026-11-02" "kirisute" "User Commands"
 .SH NAME
-kirisute \- cut Nintendo DS and DSi ROM files down to their real size
+kirisute \- cut Game Boy Advance, DS and DSi ROM files down to their real size
 .SH SYNOPSIS
 .B kirisute
 .br
@@ -14,14 +14,23 @@ kirisute \- cut Nintendo DS and DSi ROM files down to their real size
 .B kirisute help
 .SH DESCRIPTION
 .B kirisute
-removes the padding at the end of Nintendo DS and DSi ROM files. Each ROM is
-cut to the size its header declares: the used ROM size for a DS ROM, plus its
-download-play RSA certificate when it has one, and the full DSi area for a
-DSi-enhanced or DSi-only ROM, as GodMode9 trims them.
+removes the padding at the end of Game Boy Advance, Nintendo DS and DSi ROM
+files.
 .PP
-A ROM given as a file is trimmed whatever its name. A folder gives the
+A DS ROM is cut to the size its header declares: the used ROM size, plus its
+download-play RSA certificate when it has one, and the full DSi area for a
+DSi-enhanced or DSi-only ROM.
+.PP
+A Game Boy Advance ROM declares no size, so it is cut after its last byte that
+is not padding, when its final byte is 00 or FF. The cut is rounded up to a
+4-byte boundary, and a ROM that would lose less than 512 bytes stays as it is.
+.PP
+A file given by name is read by its extension,
 .I .nds
-files directly inside it, and every subfolder too with
+or
+.IR .gba ,
+and as a DS ROM when it has neither. A folder gives those files directly
+inside it, and every subfolder too with
 .BR \-\-recursive .
 Symbolic links, hidden files and hidden folders are left alone, and
 .B kirisute
@@ -54,8 +63,9 @@ Print the usage page.
 List what would be trimmed and change nothing.
 .TP
 .B \-\-info
-Print each ROM's header and change nothing: its title, game code, unit code,
-download-play certificate, trimmed size and padding.
+Print each ROM's header and change nothing: its title and game code, then the
+unit code and download-play certificate of a DS ROM or the maker code and
+revision of a Game Boy Advance ROM, then its trimmed size and padding.
 .TP
 .BR \-\-verify ", " \-\-no\-verify
 Trim only a ROM whose padding holds nothing but 00 or FF bytes. A ROM with any
@@ -68,9 +78,7 @@ Keep each original as
 A ROM that already has one stays as it is.
 .TP
 .B \-\-recursive
-Look for
-.I .nds
-files in every subfolder of each folder given.
+Look for ROM files in every subfolder of each folder given.
 .TP
 .B \-\-json
 Print the result as one JSON object on stdout, for scripts: the counts of ROMs
@@ -97,13 +105,13 @@ no unless set.
 skipped or could not be trimmed, or the arguments are wrong.
 .SH EXAMPLES
 .TP
-.B kirisute \-\-dry\-run *.nds
+.B kirisute \-\-dry\-run *.nds *.gba
 Show what trimming every ROM in the current folder would do.
 .TP
 .B kirisute \-\-backup \-\-verify game.nds
 Trim one ROM, keep the original, and refuse if the padding holds data.
 .TP
-.B kirisute \-\-recursive ~/roms/nds
+.B kirisute \-\-recursive ~/roms
 Trim every ROM under a folder.
 .SH SEE ALSO
 .BR head (1),

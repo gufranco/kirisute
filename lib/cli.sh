@@ -5,11 +5,11 @@
 
 ks_usage() {
   cat <<'USAGE'
-kirisute - cut Nintendo DS and DSi ROM files down to their real size
+kirisute - cut Game Boy Advance, DS and DSi ROM files down to their real size
 
 usage:
   kirisute                      ask for a ROM file or folder, then trim it
-  kirisute [options] <rom>...   trim each ROM file, and the .nds files of each
+  kirisute [options] <rom>...   trim each ROM file, and the ROM files of each
                                 folder given
   kirisute doctor               check the tools kirisute needs
   kirisute version              print the version
@@ -21,7 +21,7 @@ options:
   --verify, --no-verify         trim only a ROM whose padding holds nothing
                                 but 00 or FF bytes
   --backup, --no-backup         keep each original as <rom>.bak
-  --recursive                   look for .nds files in every subfolder too
+  --recursive                   look for ROM files in every subfolder too
   --json                        print the result as one JSON object, for
                                 scripts
 
@@ -30,19 +30,22 @@ environment:
   KIRISUTE_BACKUP               yes or no, the default for --backup, no
 
 notes:
-  A ROM keeps everything its header declares: the download-play certificate
-  of a DS ROM that has one, and the DSi area of a DSi-enhanced or DSi-only
-  ROM, as GodMode9 trims them. A file whose logo or header checksum is wrong,
-  or whose header declares more than the file holds, stays as it is. Each ROM
-  is written to a temporary file beside it and renamed over it, so an
+  A folder gives its .nds and .gba files; a file given by name is read by its
+  extension, and as a DS ROM when the extension is neither. A DS ROM keeps
+  everything its header declares: its download-play certificate when it has
+  one, and the DSi area of a DSi-enhanced or DSi-only ROM. A Game Boy Advance
+  ROM is cut after its last byte that is not padding, on a 4-byte boundary,
+  when that saves at least 512 bytes. A file whose logo or header checksum is
+  wrong, or whose header declares more than the file holds, stays as it is.
+  Each ROM is written to a temporary file beside it and renamed over it, so an
   interrupted run never leaves half a file. Symbolic links, hidden files and
   hidden folders are left alone. -- ends the options, and a file named help,
   doctor or version is trimmed by giving its path, such as ./help.
 
 examples:
-  kirisute --dry-run *.nds
+  kirisute --dry-run *.nds *.gba
   kirisute --backup --verify game.nds
-  kirisute --recursive ~/roms/nds
+  kirisute --recursive ~/roms
 USAGE
 }
 

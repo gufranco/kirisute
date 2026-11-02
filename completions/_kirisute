@@ -9,7 +9,7 @@ _kirisute() {
   )
 
   if (( CURRENT == 2 )) && [[ "${words[2]}" != -* ]]; then
-    _alternative 'commands:command:_describe command commands' 'roms:rom:_files -g "*.(nds|NDS)(-.)" -g "*(-/)"'
+    _alternative 'commands:command:_describe command commands' 'roms:rom:_files -g "*.(nds|NDS|gba|GBA)(-.)" -g "*(-/)"'
     return
   fi
 
@@ -20,9 +20,9 @@ _kirisute() {
     '--no-verify[trim whatever the padding holds]' \
     '--backup[keep each original as <rom>.bak]' \
     '--no-backup[keep no copy of the original]' \
-    '--recursive[look for .nds files in every subfolder too]' \
+    '--recursive[look for ROM files in every subfolder too]' \
     '--json[print the result as one JSON object, for scripts]' \
-    '*:rom:_files -g "*.(nds|NDS)(-.)" -g "*(-/)"'
+    '*:rom:_files -g "*.(nds|NDS|gba|GBA)(-.)" -g "*(-/)"'
 }
 
 _kirisute "$@"
