@@ -26,6 +26,20 @@ teardown() {
   [[ "${output}" == *"Trimmed ${ROM} from 64.0 KiB to 16.0 KiB."$'\n'"Trimmed 1 ROM and saved 48.0 KiB." ]]
 }
 
+@test "a ROM given by name is read as a DS ROM whatever its extension" {
+  # Arrange
+  local rom="${WORK}/game.bin"
+  ks_test_rom "${rom}" plain 16384 0 65536
+
+  # Act
+  run ks_test_run "${rom}"
+
+  # Assert
+  [[ "${status}" -eq 0 ]]
+  ks_test_size_is "${rom}" 16384
+  [[ "${output}" == *"Trimmed ${rom} from 64.0 KiB to 16.0 KiB."* ]]
+}
+
 @test "a DS ROM keeps its download-play certificate" {
   # Arrange
   ks_test_rom "${ROM}" rsa 16384 0 65536

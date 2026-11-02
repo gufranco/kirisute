@@ -22,6 +22,8 @@ KS_LIB="$(cd "${ks_self%/*}/../lib" && pwd)" || exit 1
 . "${KS_LIB}/args.sh"
 # shellcheck source=SCRIPTDIR/../lib/rom.sh
 . "${KS_LIB}/rom.sh"
+# shellcheck source=SCRIPTDIR/../lib/nds.sh
+. "${KS_LIB}/nds.sh"
 # shellcheck source=SCRIPTDIR/../lib/trim.sh
 . "${KS_LIB}/trim.sh"
 # shellcheck source=SCRIPTDIR/../lib/walk.sh

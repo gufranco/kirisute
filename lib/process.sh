@@ -17,7 +17,8 @@ ks_record() {
   if [ "$1" = info ]; then
     ks_rc_title="$(ks_json_string "${KS_ROM_TITLE}")"
     ks_rc_code="$(ks_json_string "${KS_ROM_CODE}")"
-    ks_rc_item="${ks_rc_item},\"title\":${ks_rc_title},\"game_code\":${ks_rc_code},\"unit_code\":${KS_ROM_UNIT}"
+    ks_rc_system="$(ks_rom_json)"
+    ks_rc_item="${ks_rc_item},\"title\":${ks_rc_title},\"game_code\":${ks_rc_code}${ks_rc_system}"
   fi
   KS_RESULTS="${KS_RESULTS}${KS_RESULTS:+,}${ks_rc_item}}"
 }
@@ -29,12 +30,7 @@ ks_skip() {
 }
 
 ks_check() {
-  case "${KS_ROM_STATUS}" in
-  small) KS_REASON="is too small to hold a DS header" ;;
-  logo) KS_REASON="has a bad logo checksum and is not a DS ROM" ;;
-  crc) KS_REASON="has a bad header checksum" ;;
-  *) KS_REASON="" ;;
-  esac
+  ks_rom_reason
   [ -z "${KS_REASON}" ] || return 1
   if ! ks_rom_target "$1"; then
     KS_REASON="declares a ROM size of 0"
@@ -60,18 +56,10 @@ ks_ready() {
   return 1
 }
 
-ks_keeps() {
-  case "${KS_ROM_KIND}" in
-  rsa) printf ', keeping its download-play certificate' ;;
-  dsi) printf ', keeping its DSi area' ;;
-  *) : ;;
-  esac
-}
-
 ks_cut() {
   ks_cu_before="$(ks_human "${KS_ROM_SIZE}")"
   ks_cu_after="$(ks_human "${KS_ROM_TARGET}")"
-  ks_cu_keeps="$(ks_keeps)"
+  ks_cu_keeps="$(ks_rom_keeps)"
   if [ "${KS_DRY_RUN}" = no ] && ! ks_trim_apply "$1" "${KS_ROM_TARGET}"; then
     KS_FAILED=$((KS_FAILED + 1))
     ks_record failed "could not trim" "$1"
@@ -122,10 +110,8 @@ ks_show_info() {
   ks_si_size="$(ks_human "${KS_ROM_SIZE}")"
   ks_si_trim="$(ks_human "${KS_ROM_TARGET}")"
   ks_si_pad="$(ks_human "$((KS_ROM_SIZE - KS_ROM_TARGET))")"
-  ks_si_unit="$(ks_rom_unit_label "${KS_ROM_UNIT}")"
-  ks_si_cert="$(ks_rom_kind_label "${KS_ROM_KIND}")"
   ks_say 8 "File:   $1, ${ks_si_size}"
   printf 'Title:  %s\nCode:   %s\n' "${KS_ROM_TITLE}" "${KS_ROM_CODE}"
-  printf 'Unit:   0x%02x, %s\nCert:   %s\n' "${KS_ROM_UNIT}" "${ks_si_unit}" "${ks_si_cert}"
+  ks_rom_info
   printf 'Trim:   %s, %s of padding\n\n' "${ks_si_trim}" "${ks_si_pad}"
 }

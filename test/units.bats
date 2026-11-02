@@ -30,7 +30,7 @@ teardown() {
   local code=9
 
   # Act
-  run ks_test_call ks_rom_unit_label "${code}"
+  run ks_test_call ks_nds_unit_label "${code}"
 
   # Assert
   [[ "${output}" == "unknown" ]]

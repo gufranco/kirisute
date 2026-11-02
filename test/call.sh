@@ -11,6 +11,8 @@ KS_LIB="$(cd "$(dirname "$0")/../lib" && pwd)" || exit 1
 . "${KS_LIB}/doctor.sh"
 # shellcheck source=SCRIPTDIR/../lib/rom.sh
 . "${KS_LIB}/rom.sh"
+# shellcheck source=SCRIPTDIR/../lib/nds.sh
+. "${KS_LIB}/nds.sh"
 # shellcheck source=SCRIPTDIR/../lib/trim.sh
 . "${KS_LIB}/trim.sh"
 

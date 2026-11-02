@@ -29,10 +29,8 @@ ks_walk_entry() {
     [ "${KS_RECURSIVE}" = no ] || ks_walk_dir "$1" "$(($2 + 1))" "$3"
     return 0
   fi
-  case "$3" in
-  *.[nN][dD][sS]) [ ! -f "$3" ] || ks_visit "$1" "$3" ;;
-  *) : ;;
-  esac
+  ks_rom_system "$3" || return 0
+  [ ! -f "$3" ] || ks_visit "$1" "$3"
 }
 
 ks_walk_deep() {
