@@ -97,6 +97,10 @@ ks_test_gba() {
   bash "${KIRISUTE_TESTS_DIR}/gba.bash" "$@"
 }
 
+ks_test_ctr() {
+  bash "${KIRISUTE_TESTS_DIR}/ctr.bash" "$@"
+}
+
 ks_test_size_is() {
   local size
   size="$(wc -c <"$1")"

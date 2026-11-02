@@ -111,7 +111,8 @@ ks_show_info() {
   ks_si_trim="$(ks_human "${KS_ROM_TARGET}")"
   ks_si_pad="$(ks_human "$((KS_ROM_SIZE - KS_ROM_TARGET))")"
   ks_say 8 "File:   $1, ${ks_si_size}"
-  printf 'Title:  %s\nCode:   %s\n' "${KS_ROM_TITLE}" "${KS_ROM_CODE}"
+  [ -z "${KS_ROM_TITLE}" ] || printf 'Title:  %s\n' "${KS_ROM_TITLE}"
+  [ -z "${KS_ROM_CODE}" ] || printf 'Code:   %s\n' "${KS_ROM_CODE}"
   ks_rom_info
   printf 'Trim:   %s, %s of padding\n\n' "${ks_si_trim}" "${ks_si_pad}"
 }

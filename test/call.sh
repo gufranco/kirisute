@@ -15,6 +15,10 @@ KS_LIB="$(cd "$(dirname "$0")/../lib" && pwd)" || exit 1
 . "${KS_LIB}/nds.sh"
 # shellcheck source=SCRIPTDIR/../lib/gba.sh
 . "${KS_LIB}/gba.sh"
+# shellcheck source=SCRIPTDIR/../lib/3ds.sh
+. "${KS_LIB}/3ds.sh"
+# shellcheck source=SCRIPTDIR/../lib/cxi.sh
+. "${KS_LIB}/cxi.sh"
 # shellcheck source=SCRIPTDIR/../lib/trim.sh
 . "${KS_LIB}/trim.sh"
 

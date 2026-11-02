@@ -1,6 +1,6 @@
 .TH KIRISUTE 1 "2026-11-02" "kirisute" "User Commands"
 .SH NAME
-kirisute \- cut Game Boy Advance, DS and DSi ROM files down to their real size
+kirisute \- cut GBA, DS, DSi and 3DS ROM files down to their real size
 .SH SYNOPSIS
 .B kirisute
 .br
@@ -14,8 +14,8 @@ kirisute \- cut Game Boy Advance, DS and DSi ROM files down to their real size
 .B kirisute help
 .SH DESCRIPTION
 .B kirisute
-removes the padding at the end of Game Boy Advance, Nintendo DS and DSi ROM
-files.
+removes the padding at the end of Game Boy Advance, Nintendo DS, DSi and 3DS
+ROM files.
 .PP
 A DS ROM is cut to the size its header declares: the used ROM size, plus its
 download-play RSA certificate when it has one, and the full DSi area for a
@@ -25,22 +25,35 @@ A Game Boy Advance ROM declares no size, so it is cut after its last byte that
 is not padding, when its final byte is 00 or FF. The cut is rounded up to a
 4-byte boundary, and a ROM that would lose less than 512 bytes stays as it is.
 .PP
-A file given by name is read by its extension,
+A 3DS cartridge image is cut at the end of its last partition, counted in the
+media unit its header sets. It must carry the NCSD magic and a media ID, have a
+first partition, keep its partitions in order without overlap, and keep them
+within its declared size; a console NAND image is refused. A 3DS executable
+carrying the NCCH magic is cut to the size its header declares.
+.PP
+A file given by name is read by its extension:
+.I .gba
+for Game Boy Advance,
 .I .nds
+for DS and DSi,
+.I .3ds
 or
-.IR .gba ,
-and as a DS ROM when it has neither. A folder gives those files directly
+.I .cci
+for a 3DS cartridge image and
+.I .cxi
+for a 3DS executable, and as a DS ROM when it has none of these. A folder gives
+those files directly
 inside it, and every subfolder too with
 .BR \-\-recursive .
 Symbolic links, hidden files and hidden folders are left alone, and
 .B kirisute
 looks no deeper than 32 folders.
 .PP
-A file whose logo or header checksum is wrong, that is too small to hold a
-header, or whose header declares more than the file holds, stays as it is with
-a warning. Each trimmed ROM is written to a temporary file beside it, given the
-original's permissions and renamed over it, so an interrupted run never leaves
-half a file.
+A file whose header fails its checks, that is too small to hold a header, or
+whose header declares more than the file holds, stays as it is with a warning.
+Each trimmed ROM is written to a temporary file beside it, given the original's
+permissions and renamed over it, so an interrupted run never leaves half a
+file.
 .PP
 Before a trim,
 .B kirisute
@@ -63,9 +76,11 @@ Print the usage page.
 List what would be trimmed and change nothing.
 .TP
 .B \-\-info
-Print each ROM's header and change nothing: its title and game code, then the
-unit code and download-play certificate of a DS ROM or the maker code and
-revision of a Game Boy Advance ROM, then its trimmed size and padding.
+Print each ROM's header and change nothing: its title and game code when it has
+them, then the unit code and download-play certificate of a DS ROM, the maker
+code and revision of a Game Boy Advance ROM, the media ID and partition count
+of a 3DS cartridge image or the program ID of a 3DS executable, then its
+trimmed size and padding.
 .TP
 .BR \-\-verify ", " \-\-no\-verify
 Trim only a ROM whose padding holds nothing but 00 or FF bytes. A ROM with any
@@ -105,7 +120,7 @@ no unless set.
 skipped or could not be trimmed, or the arguments are wrong.
 .SH EXAMPLES
 .TP
-.B kirisute \-\-dry\-run *.nds *.gba
+.B kirisute \-\-dry\-run *.nds *.3ds
 Show what trimming every ROM in the current folder would do.
 .TP
 .B kirisute \-\-backup \-\-verify game.nds

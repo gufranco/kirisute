@@ -7,6 +7,8 @@ ks_rom_system() {
   case "$1" in
   *.[nN][dD][sS]) KS_SYSTEM=nds ;;
   *.[gG][bB][aA]) KS_SYSTEM=gba ;;
+  *.3[dD][sS] | *.[cC][cC][iI]) KS_SYSTEM=3ds ;;
+  *.[cC][xX][iI]) KS_SYSTEM=cxi ;;
   *) return 1 ;;
   esac
 }
