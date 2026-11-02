@@ -2,7 +2,7 @@
 
 <h1>kirisute</h1>
 
-<strong>把任天堂 DS 和 DSi 的 ROM 文件裁到真实大小，保留头部声明的全部内容。</strong>
+<strong>把 Game Boy Advance、DS、DSi 和 3DS 的 ROM 以及 PSP 的 ISO 裁到真实大小，并按头部信息命名。</strong>
 
 [English](README.md) | [日本語](README.ja.md) | 简体中文 | [繁體中文 (香港)](README.zh-HK.md)
 
@@ -13,29 +13,31 @@
 <p align="center">
   <a href="#quick-start"><strong>快速开始</strong></a> |
   <a href="#what-is-kept">保留什么</a> |
+  <a href="#rename">重命名</a> |
   <a href="#development">开发</a>
 </p>
 
 </div>
 
-DS 卡带的转储和原来的芯片一样大，文件末尾是填充。`kirisute` 是日语的「切り捨て」，意思是舍去余下的部分：它读取每个 ROM 的头部，去掉数据之后的内容，所以一个 24 MiB 游戏的 64 MiB 转储在烧录卡的存储卡上只占 24 MiB。
+卡带的转储和原来的芯片一样大，光盘镜像也可能在最后一个扇区之后带着填充。`kirisute` 是日语的「切り捨て」，意思是舍去余下的部分：它读取每个文件的头部，去掉数据之后的内容，所以一个 24 MiB 游戏的 64 MiB 转储在烧录卡的存储卡上只占 24 MiB。
 
 ---
 
 ```console
-$ kirisute --backup *.nds
+$ kirisute --backup download-play.nds advance.gba cartridge.3ds umd.iso notes.nds
 
-Files:  4 ROMs, 112.1 MiB
+Files:  5 ROMs, 304.1 MiB
 Plan:   cut each ROM to the size its header declares
         keep each original as <rom>.bak
 
 Trimmed download-play.nds from 32.0 MiB to 8.0 MiB, keeping its download-play
 certificate.
-Trimmed dsi-enhanced.nds from 64.0 MiB to 24.0 MiB, keeping its DSi area.
-Trimmed homebrew.nds from 16.0 MiB to 4.0 MiB.
+Trimmed advance.gba from 16.0 MiB to 6.0 MiB.
+Trimmed cartridge.3ds from 128.0 MiB to 42.0 MiB.
+Trimmed umd.iso from 128.0 MiB to 100.0 MiB.
 kirisute: warning: notes.nds has a bad logo checksum and is not a DS ROM, so it
 stays as it is.
-Trimmed 3 of 4 ROMs and saved 76.0 MiB.
+Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 ```
 
 <a id="quick-start"></a>
@@ -86,44 +88,73 @@ rm                 ok       /bin/rm, bsd
 
 | 命令 | 用途 |
 |:-----|:-----|
-| `kirisute [options] <rom>...` | 裁剪每个 ROM 文件，以及所给文件夹中的 `.nds` 文件 |
+| `kirisute [options] <rom>...` | 裁剪每个 ROM 文件，以及所给文件夹中的 ROM 文件 |
+| `kirisute rename [options] <rom>...` | 按头部中的标题和代码重命名每个 ROM |
 | 不带参数的 `kirisute` | 在终端中运行时询问 ROM 文件或文件夹，默认为当前文件夹 |
 | `kirisute doctor` | 列出所需的工具及各自的种类与版本 |
 | `kirisute version`、`kirisute help` | 显示版本或完整的用法说明 |
 
 | 选项 | 作用 |
 |:-----|:-----|
-| `--dry-run` | 列出会裁剪的内容，不做任何改动 |
-| `--info` | 显示每个 ROM 的头部：标题、游戏代码、单元代码、证书、裁剪后大小和填充 |
+| `--dry-run` | 列出会裁剪或重命名的内容，不做任何改动 |
+| `--info` | 显示每个 ROM 的头部：标题、代码、各系统特有的字段、裁剪后大小和填充 |
 | `--verify`、`--no-verify` | 只裁剪填充全是 `00` 或 `FF` 字节的 ROM |
 | `--backup`、`--no-backup` | 把每个原文件保留为 `<rom>.bak` |
-| `--recursive` | 也在所有子文件夹中查找 `.nds` 文件 |
+| `--recursive` | 也在所有子文件夹中查找 ROM 文件 |
 | `--json` | 把结果输出为一个 JSON 对象，供脚本使用 |
 
 `KIRISUTE_VERIFY=yes` 和 `KIRISUTE_BACKUP=yes` 会让 `--verify` 和 `--backup` 成为默认；命令行上的选项优先。kirisute 遵循家族共享的命令行约定，内容见 [FAMILY.md](FAMILY.md)。
 
 ```bash
-kirisute --dry-run *.nds                 # 看看裁剪能省多少
+kirisute --dry-run *.nds *.3ds           # 看看裁剪能省多少
 kirisute --backup --verify game.nds      # 保留原文件，填充中有数据时拒绝
-kirisute --recursive ~/roms/nds          # 裁剪整个游戏库
+kirisute --recursive ~/roms              # 裁剪整个游戏库
+kirisute rename --dry-run *.gba          # 看看每个 ROM 会取什么名字
 ```
 
 <a id="what-is-kept"></a>
 
 ## 保留什么
 
-| ROM | 裁剪到 |
-|:----|:-------|
-| DS | 头部偏移 `0x80` 处的 ROM 大小 |
-| 带下载游戏的 DS | 该大小加上其后 136 字节的 RSA 证书 |
-| DSi 增强或 DSi 专用 | 头部偏移 `0x210` 处的 DSi 区域大小 |
+| 文件 | 扩展名 | 裁剪到 |
+|:-----|:-------|:-------|
+| DS | `.nds` | 头部偏移 `0x80` 处的 ROM 大小 |
+| 带下载游戏的 DS | `.nds` | 该大小加上其后 136 字节的 RSA 证书 |
+| DSi 增强或 DSi 专用 | `.nds` | 头部偏移 `0x210` 处的 DSi 区域大小 |
+| Game Boy Advance | `.gba` | 最后一个非填充字节，向上取整到 4 字节，且只在能省下至少 512 字节时裁剪 |
+| 3DS 卡带镜像 | `.3ds`、`.cci` | 最后一个分区的结尾，按头部设定的媒体单位计算 |
+| 3DS 可执行文件 | `.cxi` | NCCH 头部声明的大小 |
+| PSP 光盘镜像 | `.iso` | ISO 9660 卷描述符声明的卷 |
 
-这些就是 GodMode9 裁剪到的大小。
-
-- 标志或头部校验和错误、小到放不下头部、或头部声明的大小超过文件本身的文件会保持原样并给出警告，运行以状态 1 结束。
+- 每个文件在处理前都会检查。DS 和 Game Boy Advance 的 ROM 需要正确的标志和头部校验和；3DS 镜像需要 NCSD 魔数、媒体 ID 和顺序正确的分区，主机 NAND 镜像会被拒绝；PSP 镜像需要 `PSP_GAME` 文件夹。检查不通过、小到放不下头部、或头部声明的大小超过文件本身的文件会保持原样并给出警告，运行以状态 1 结束。
 - 不加 `--verify` 时，真实大小之后的字节不论内容都会被去掉。加上后，那里只要有 `00` 和 `FF` 以外的字节，该 ROM 就保持原样，警告会指出第一个这样的字节。
 - 每个裁剪后的 ROM 先写入旁边的临时文件，赋予原文件的权限，再重命名覆盖原文件，所以中断的运行不会留下写了一半的文件。
-- 文件夹只提供其中直接包含的 `.nds` 文件，不分大小写；`--recursive` 最多深入 32 层文件夹。符号链接、`._game.nds` 这样的隐藏文件和隐藏文件夹都不会被处理。
+- 文件夹只提供其中直接包含的上述扩展名的文件，不分大小写；`--recursive` 最多深入 32 层文件夹。按名称给出的其他扩展名的文件会当作 DS ROM 读取。符号链接、`._game.nds` 这样的隐藏文件和隐藏文件夹都不会被处理。
+
+<a id="rename"></a>
+
+## 重命名
+
+`kirisute rename` 按头部信息给每个 ROM 命名，让一文件夹的转储读起来像一份目录：
+
+```console
+$ kirisute rename --dry-run download-play.nds advance.gba cartridge.3ds umd.iso
+
+Files:  4 ROMs, 156.0 MiB
+Plan:   rename each ROM after the title and code in its header
+        dry run: list each new name and change nothing
+
+Would rename download-play.nds to KIRISUTE (KSTE).nds.
+Would rename advance.gba to KIRISUTE GBA (AKSE).gba.
+Would rename cartridge.3ds to CTR-P-AKSE.3ds.
+Would rename umd.iso to Kirisute Test (ULUS99999).iso.
+Dry run: 4 ROMs would be renamed. Nothing was changed.
+```
+
+- 名字是 `<标题> (<代码>)`；像 3DS 镜像那样头部没有标题时，只用代码。PSP 镜像的标题和光盘 ID 取自 `PSP_GAME/PARAM.SFO`。
+- 扩展名保持小写。标题中的斜杠和冒号会变成连字符，控制字符会被去掉。
+- 绝不会占用其他文件已有的名字：那个 ROM 会保持原样并给出警告。只改变大小写的重命名在 Mac 的磁盘上也能完成。
+- `rename` 接受 `--dry-run`、`--recursive` 和 `--json`。
 
 ## 可移植性
 
@@ -142,7 +173,7 @@ kirisute --recursive ~/roms/nds          # 裁剪整个游戏库
 | `make test-linux` | 在 Ubuntu 容器中运行同样的测试 |
 | `make coverage` | 合并本机与 Ubuntu 容器中的 bashcov 行覆盖率，并执行与 CI 相同的 100% 门槛 |
 
-测试裁剪的是真实文件：[`test/rom.bash`](test/rom.bash) 会生成校验和正确的 DS、下载游戏和 DSi ROM，标志图像用替代数据，所以仓库中没有任天堂的数据。只有失败是注入的，通过 `PATH` 上的小包装脚本实现。推送到 `main` 且 CI 通过后，semantic-release 会运行：`feat` 或 `fix` 提交会发布新版本，更新 [`lib/core.sh`](lib/core.sh) 中的 `KIRISUTE_VERSION` 和 CHANGELOG，并更新 Homebrew formula。
+测试裁剪的是真实文件。每个系统都有一个生成器，写出头部和校验和都正确的文件：DS 用 [`test/rom.bash`](test/rom.bash)，另有 [`test/gba.bash`](test/gba.bash)、3DS 用 [`test/ctr.bash`](test/ctr.bash) 和 [`test/psp.bash`](test/psp.bash)。标志图像用替代数据，所以仓库中没有任天堂或索尼的数据。只有失败是注入的，通过 `PATH` 上的小包装脚本实现。推送到 `main` 且 CI 通过后，semantic-release 会运行：`feat` 或 `fix` 提交会发布新版本，更新 [`lib/core.sh`](lib/core.sh) 中的 `KIRISUTE_VERSION` 和 CHANGELOG，并更新 Homebrew formula。
 
 ## 许可证
 

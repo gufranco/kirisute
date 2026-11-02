@@ -2,7 +2,7 @@
 
 <h1>kirisute</h1>
 
-<strong>ニンテンドー DS と DSi の ROM ファイルを、ヘッダーが宣言する内容を残したまま本来のサイズに切り詰めます。</strong>
+<strong>ゲームボーイアドバンス、DS、DSi、3DS の ROM と PSP の ISO を本来のサイズに切り詰め、ヘッダーに従って名前を付けます。</strong>
 
 [English](README.md) | 日本語 | [简体中文](README.zh-Hans.md) | [繁體中文 (香港)](README.zh-HK.md)
 
@@ -13,29 +13,31 @@
 <p align="center">
   <a href="#quick-start"><strong>クイックスタート</strong></a> |
   <a href="#what-is-kept">残すもの</a> |
+  <a href="#rename">名前の変更</a> |
   <a href="#development">開発</a>
 </p>
 
 </div>
 
-DS カートリッジのダンプは元のチップと同じ大きさで、ファイルの末尾は詰め物です。`kirisute` は日本語の「切り捨て」です。各 ROM のヘッダーを読み、データの後ろにあるものを落とすので、24 MiB のゲームの 64 MiB のダンプはフラッシュカートのカード上で 24 MiB になります。
+カートリッジのダンプは元のチップと同じ大きさで、ディスクイメージも最後のセクターの後ろに詰め物を持つことがあります。`kirisute` は日本語の「切り捨て」です。各ファイルのヘッダーを読み、データの後ろにあるものを落とすので、24 MiB のゲームの 64 MiB のダンプはフラッシュカートのカード上で 24 MiB になります。
 
 ---
 
 ```console
-$ kirisute --backup *.nds
+$ kirisute --backup download-play.nds advance.gba cartridge.3ds umd.iso notes.nds
 
-Files:  4 ROMs, 112.1 MiB
+Files:  5 ROMs, 304.1 MiB
 Plan:   cut each ROM to the size its header declares
         keep each original as <rom>.bak
 
 Trimmed download-play.nds from 32.0 MiB to 8.0 MiB, keeping its download-play
 certificate.
-Trimmed dsi-enhanced.nds from 64.0 MiB to 24.0 MiB, keeping its DSi area.
-Trimmed homebrew.nds from 16.0 MiB to 4.0 MiB.
+Trimmed advance.gba from 16.0 MiB to 6.0 MiB.
+Trimmed cartridge.3ds from 128.0 MiB to 42.0 MiB.
+Trimmed umd.iso from 128.0 MiB to 100.0 MiB.
 kirisute: warning: notes.nds has a bad logo checksum and is not a DS ROM, so it
 stays as it is.
-Trimmed 3 of 4 ROMs and saved 76.0 MiB.
+Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 ```
 
 <a id="quick-start"></a>
@@ -86,44 +88,73 @@ rm                 ok       /bin/rm, bsd
 
 | コマンド | 目的 |
 |:---------|:-----|
-| `kirisute [options] <rom>...` | 各 ROM ファイルと、指定したフォルダの `.nds` ファイルを切り詰めます |
+| `kirisute [options] <rom>...` | 各 ROM ファイルと、指定したフォルダの ROM ファイルを切り詰めます |
+| `kirisute rename [options] <rom>...` | 各 ROM の名前を、ヘッダーのタイトルとコードに変えます |
 | 引数なしの `kirisute` | ターミナルでは ROM ファイルかフォルダを尋ねます。既定は現在のフォルダです |
 | `kirisute doctor` | 必要なツールを、それぞれの種類とバージョン付きで一覧にします |
 | `kirisute version`、`kirisute help` | バージョンか使い方のページを表示します |
 
 | オプション | 効果 |
 |:-----------|:-----|
-| `--dry-run` | 切り詰める内容を一覧にし、何も変えません |
-| `--info` | 各 ROM のヘッダーを表示します。タイトル、ゲームコード、ユニットコード、証明書、切り詰め後のサイズ、詰め物 |
+| `--dry-run` | 切り詰めや名前の変更の内容を一覧にし、何も変えません |
+| `--info` | 各 ROM のヘッダーを表示します。タイトル、コード、システムごとの項目、切り詰め後のサイズ、詰め物 |
 | `--verify`、`--no-verify` | 詰め物が `00` か `FF` だけの ROM だけを切り詰めます |
 | `--backup`、`--no-backup` | 元のファイルを `<rom>.bak` として残します |
-| `--recursive` | すべてのサブフォルダからも `.nds` ファイルを探します |
+| `--recursive` | すべてのサブフォルダからも ROM ファイルを探します |
 | `--json` | 結果を 1 つの JSON オブジェクトで出力します。スクリプト向けです |
 
 `KIRISUTE_VERIFY=yes` と `KIRISUTE_BACKUP=yes` で `--verify` と `--backup` が既定になり、コマンドラインのオプションが優先されます。kirisute はファミリー共通のコマンドライン規約に従います。内容は [FAMILY.md](FAMILY.md) にあります。
 
 ```bash
-kirisute --dry-run *.nds                 # 切り詰めで減る量を確かめる
+kirisute --dry-run *.nds *.3ds           # 切り詰めで減る量を確かめる
 kirisute --backup --verify game.nds      # 元を残し、詰め物にデータがあれば断る
-kirisute --recursive ~/roms/nds          # ライブラリ全体を切り詰める
+kirisute --recursive ~/roms              # ライブラリ全体を切り詰める
+kirisute rename --dry-run *.gba          # 各 ROM が付ける名前を確かめる
 ```
 
 <a id="what-is-kept"></a>
 
 ## 残すもの
 
-| ROM | 切り詰め後 |
-|:----|:-----------|
-| DS | ヘッダーのオフセット `0x80` にある ROM サイズ |
-| ダウンロードプレイ付きの DS | そのサイズに、後ろに続く 136 バイトの RSA 証明書を加えたもの |
-| DSi 拡張または DSi 専用 | ヘッダーのオフセット `0x210` にある DSi 領域のサイズ |
+| ファイル | 拡張子 | 切り詰め後 |
+|:---------|:-------|:-----------|
+| DS | `.nds` | ヘッダーのオフセット `0x80` にある ROM サイズ |
+| ダウンロードプレイ付きの DS | `.nds` | そのサイズに、後ろに続く 136 バイトの RSA 証明書を加えたもの |
+| DSi 拡張または DSi 専用 | `.nds` | ヘッダーのオフセット `0x210` にある DSi 領域のサイズ |
+| ゲームボーイアドバンス | `.gba` | 詰め物でない最後のバイトまで。4 バイト単位に切り上げ、512 バイト以上減るときだけ |
+| 3DS カートリッジイメージ | `.3ds`、`.cci` | 最後のパーティションの終わり。ヘッダーが定めるメディア単位で数えます |
+| 3DS 実行ファイル | `.cxi` | NCCH ヘッダーが宣言するサイズ |
+| PSP ディスクイメージ | `.iso` | ISO 9660 のボリューム記述子が宣言するボリューム |
 
-これは GodMode9 が切り詰めるサイズと同じです。
-
-- ロゴかヘッダーのチェックサムが違うファイル、ヘッダーより小さいファイル、ファイルより大きいサイズを宣言するファイルは警告付きでそのまま残り、終了ステータスは 1 になります。
+- 各ファイルは触る前に検査します。DS とゲームボーイアドバンスの ROM は正しいロゴとヘッダーのチェックサムが必要です。3DS イメージは NCSD のマジック、メディア ID、順番どおりのパーティションが必要で、本体 NAND のイメージは断ります。PSP イメージは `PSP_GAME` フォルダが必要です。検査に通らないファイル、ヘッダーより小さいファイル、ファイルより大きいサイズを宣言するファイルは警告付きでそのまま残り、終了ステータスは 1 になります。
 - `--verify` がなければ、本来のサイズより後ろのバイトは中身にかかわらず落とします。あれば、そこに `00` と `FF` 以外があればその ROM は残り、警告は最初のそのバイトを示します。
 - 切り詰めた ROM は隣の一時ファイルに書き、元の権限を付けてから上書きの名前変更をするので、中断しても半端なファイルは残りません。
-- フォルダは直下の `.nds` ファイルだけを、大文字小文字を問わず対象にします。`--recursive` は 32 階層まで降ります。シンボリックリンク、`._game.nds` のような隠しファイル、隠しフォルダには触れません。
+- フォルダは直下にある上の拡張子のファイルだけを、大文字小文字を問わず対象にします。`--recursive` は 32 階層まで降ります。名前で指定したほかの拡張子のファイルは DS の ROM として読みます。シンボリックリンク、`._game.nds` のような隠しファイル、隠しフォルダには触れません。
+
+<a id="rename"></a>
+
+## 名前の変更
+
+`kirisute rename` は各 ROM にヘッダーに従った名前を付けるので、ダンプのフォルダが目録のように読めます。
+
+```console
+$ kirisute rename --dry-run download-play.nds advance.gba cartridge.3ds umd.iso
+
+Files:  4 ROMs, 156.0 MiB
+Plan:   rename each ROM after the title and code in its header
+        dry run: list each new name and change nothing
+
+Would rename download-play.nds to KIRISUTE (KSTE).nds.
+Would rename advance.gba to KIRISUTE GBA (AKSE).gba.
+Would rename cartridge.3ds to CTR-P-AKSE.3ds.
+Would rename umd.iso to Kirisute Test (ULUS99999).iso.
+Dry run: 4 ROMs would be renamed. Nothing was changed.
+```
+
+- 名前は `<タイトル> (<コード>)` です。3DS イメージのようにヘッダーにタイトルがなければコードだけになります。PSP イメージはタイトルとディスク ID を `PSP_GAME/PARAM.SFO` から取ります。
+- 拡張子は小文字にします。タイトルのスラッシュとコロンはハイフンになり、制御文字は落とします。
+- ほかのファイルがすでに持つ名前は決して取りません。その ROM は警告付きでそのまま残ります。大文字小文字だけの変更も Mac のディスクで動きます。
+- `rename` は `--dry-run`、`--recursive`、`--json` を受け付けます。
 
 ## 移植性
 
@@ -142,7 +173,7 @@ kirisute --recursive ~/roms/nds          # ライブラリ全体を切り詰め�
 | `make test-linux` | Ubuntu コンテナで同じテストを実行します |
 | `make coverage` | この Mac と Ubuntu コンテナでの bashcov 行カバレッジを統合し、CI と同じ 100% のゲートをかけます |
 
-テストは本物のファイルを切り詰めます。[`test/rom.bash`](test/rom.bash) がチェックサムの正しい DS、ダウンロードプレイ、DSi の ROM を作り、ロゴの画像には代わりのデータを使うので、リポジトリに任天堂のデータはありません。注入するのは失敗だけで、`PATH` 上の小さなラッパーを通します。`main` への push で CI が通ると semantic-release が動き、`feat` か `fix` のコミットがリリースを公開して、[`lib/core.sh`](lib/core.sh) の `KIRISUTE_VERSION` と CHANGELOG を更新し、Homebrew の formula を上げます。
+テストは本物のファイルを切り詰めます。システムごとのビルダーが、ヘッダーとチェックサムの正しいファイルを作ります。DS は [`test/rom.bash`](test/rom.bash)、ほかに [`test/gba.bash`](test/gba.bash)、3DS は [`test/ctr.bash`](test/ctr.bash)、[`test/psp.bash`](test/psp.bash) です。ロゴの画像には代わりのデータを使うので、リポジトリに任天堂やソニーのデータはありません。注入するのは失敗だけで、`PATH` 上の小さなラッパーを通します。`main` への push で CI が通ると semantic-release が動き、`feat` か `fix` のコミットがリリースを公開して、[`lib/core.sh`](lib/core.sh) の `KIRISUTE_VERSION` と CHANGELOG を更新し、Homebrew の formula を上げます。
 
 ## ライセンス
 
