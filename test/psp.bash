@@ -42,7 +42,14 @@ ks_test_descriptor() {
   ks_test_put_text $((at + 1)) "CD001"
   [[ "${fault}" != iso ]] || ks_test_put_text $((at + 1)) "CD002"
   KS_TEST_H[at + 6]=1
-  ks_test_put_text $((at + 8)) "PSP GAME                        "
+  local system="PSP GAME"
+  case "${fault}" in
+  nogame | homebrew | wrapper) system="LINUX" ;;
+  quoted) system='"PSP GAME"' ;;
+  video) system="UMD VIDEO" ;;
+  *) : ;;
+  esac
+  ks_test_put_text $((at + 8)) "$(printf '%-32s' "${system}")"
   ks_test_put_text $((at + 40)) "KIRISUTE_PSP                    "
   ks_test_put_both32 $((at + 80)) "${space}"
   KS_TEST_H[at + 128]=0
@@ -85,7 +92,14 @@ ks_test_tree() {
   ks_test_record "${root}" $'\001' 20 4096 2
   KS_TEST_H[root + 33]=0
   ks_test_record "${KS_TEST_RECORD_END}" $'\001' 20 4096 2
-  [[ "${fault}" != nogame ]] || game_name="PSP_DATA"
+  case "${fault}" in
+  nogame | sysonly | quoted | video) game_name="PSP_DATA" ;;
+  *) : ;;
+  esac
+  if [[ "${fault}" == wrapper ]]; then
+    ks_test_record $((root + KS_TEST_SECTOR)) "USER_L0.IMG;1" 24 2048 0
+    return 0
+  fi
   ks_test_record $((root + KS_TEST_SECTOR)) "${game_name}" 22 2048 2
   [[ "${fault}" == nosfo ]] || ks_test_record $((22 * KS_TEST_SECTOR)) "PARAM.SFO;1" 23 2048 0
   ks_test_sfo
@@ -97,6 +111,8 @@ ks_test_psp_main() {
   local total="$3"
   local fault="${4:-}"
   local lead=$((KS_TEST_PSP_LEAD * KS_TEST_SECTOR))
+  local tail=0
+  [[ "${fault}" != tail ]] || tail=204
   ks_test_blank "${lead}"
   ks_test_descriptor "${space}" "${fault}"
   ks_test_tree "${fault}"
@@ -104,7 +120,7 @@ ks_test_psp_main() {
   {
     ks_test_write_header "${lead}"
     ks_test_fill $((space * KS_TEST_SECTOR - lead)) 204
-    ks_test_fill $((total - space * KS_TEST_SECTOR)) 0
+    ks_test_fill $((total - space * KS_TEST_SECTOR)) "${tail}"
   } >"${path}.full"
   head -c "${total}" "${path}.full" >"${path}"
   rm -f "${path}.full"

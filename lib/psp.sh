@@ -11,7 +11,9 @@ ks_psp_awk_volume() {
       if (n < min) { printf "small 0 0 0 0\t\n"; exit }
       status = "ok"
       if (b[0] != 1 || text(1, 5) != "CD001" || u16(128) == 0) status = "iso"
-      printf "%s %d %d %d %d\t%s\n", status, u16(128), u32(80), u32(158), u32(166), text(40, 32)
+      sysid = text(8, 32)
+      umd = (sysid == "PSP GAME" || sysid == "\"PSP GAME\"" || sysid == "UMD VIDEO" || sysid == "UMD AUDIO")
+      printf "%s %d %d %d %d %d\t%s\n", status, umd, u16(128), u32(80), u32(158), u32(166), text(40, 32)
     }'
 }
 
@@ -81,13 +83,22 @@ ks_psp_volume() {
     awk -v min="${KS_PSP_SECTOR}" "${KS_PSP_VOLUME_AWK}"
 }
 
+ks_psp_unknown() {
+  KS_ROM_STATUS=psp
+  ks_pu_layer="$(ks_psp_find "$1" "$2" "USER_L0.IMG;1" 0)"
+  [ -z "${ks_pu_layer}" ] || KS_ROM_STATUS=wrapper
+}
+
 ks_psp_read() {
   KS_ROM_TITLE=""
   KS_ROM_CODE=""
+  KS_ROM_STRICT=yes
   ks_ps_fields="$(ks_psp_volume "$1")"
   ks_ps_head="${ks_ps_fields%%"${KS_TAB}"*}"
   KS_PSP_VOLUME="${ks_ps_fields#*"${KS_TAB}"}"
   KS_ROM_STATUS="${ks_ps_head%% *}"
+  ks_ps_head="${ks_ps_head#* }"
+  ks_ps_umd="${ks_ps_head%% *}"
   ks_ps_head="${ks_ps_head#* }"
   KS_PSP_BLOCK="${ks_ps_head%% *}"
   ks_ps_head="${ks_ps_head#* }"
@@ -96,7 +107,7 @@ ks_psp_read() {
   [ "${KS_ROM_STATUS}" = ok ] || return 0
   ks_ps_game="$(ks_psp_find "$1" "${ks_ps_root}" PSP_GAME 1)"
   if [ -z "${ks_ps_game}" ]; then
-    KS_ROM_STATUS=psp
+    [ "${ks_ps_umd}" -eq 1 ] || ks_psp_unknown "$1" "${ks_ps_root}"
     return 0
   fi
   ks_ps_sfo="$(ks_psp_find "$1" "${ks_ps_game}" "PARAM.SFO;1" 0)"
@@ -110,7 +121,8 @@ ks_psp_reason() {
   case "${KS_ROM_STATUS}" in
   small) KS_REASON="is too small to hold an ISO 9660 volume descriptor" ;;
   iso) KS_REASON="is not an ISO 9660 disc image" ;;
-  psp) KS_REASON="has no PSP_GAME folder and is not a PSP disc image" ;;
+  psp) KS_REASON="names no PSP system and has no PSP_GAME folder, so it is not a PSP disc image" ;;
+  wrapper) KS_REASON="is a development DVD-R image; join USER_L0.IMG and USER_L1.IMG, layer 0 first, and trim that" ;;
   *) KS_REASON="" ;;
   esac
 }

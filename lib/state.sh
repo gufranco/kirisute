@@ -15,6 +15,7 @@ export LC_ALL
 : "${KS_RECURSIVE:=no}"
 : "${KS_RENAME:=no}"
 : "${KS_NEW_NAME:=}"
+: "${KS_ROM_STRICT:=no}"
 : "${KS_DEPTH_MAX:=32}"
 : "${KS_ARGS_DONE:=no}"
 : "${KS_INPUTS:=0}"

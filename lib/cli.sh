@@ -38,10 +38,14 @@ notes:
   Each ROM keeps everything its header declares: a DS ROM its download-play
   certificate when it has one and the DSi area of a DSi ROM, a 3DS cartridge
   image every partition, a 3DS executable its declared size, and a PSP ISO
-  the volume its ISO 9660 descriptor declares. A Game Boy Advance ROM
-  declares no size, so it is cut after its last byte that is not padding, on
-  a 4-byte boundary, when that saves at least 512 bytes. A file whose header
-  fails its checks, or declares more than the file holds, stays as it is.
+  the volume its ISO 9660 descriptor declares, cut only when everything past
+  it is 00 or FF, since a game can read sectors outside its files. Nothing
+  inside a volume is removed, update data and padding files included. A Game
+  Boy Advance ROM declares no size, so it is cut after its last byte that is
+  not padding, on a 4-byte boundary, when that saves at least 512 bytes. A
+  file whose header fails its checks, or declares more than the file holds,
+  stays as it is. A trimmed file no longer matches the checksum of an
+  untrimmed dump in databases such as Redump or No-Intro.
   Each ROM is written to a temporary file beside it and renamed over it, so an
   interrupted run never leaves half a file. Symbolic links, hidden files and
   hidden folders are left alone. rename takes --dry-run, --recursive and

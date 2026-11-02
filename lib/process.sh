@@ -47,7 +47,7 @@ ks_check() {
 }
 
 ks_ready() {
-  if [ "${KS_VERIFY}" = yes ]; then
+  if [ "${KS_VERIFY}" = yes ] || [ "${KS_ROM_STRICT}" = yes ]; then
     ks_re_offset="$(ks_rom_dirty "$1" "${KS_ROM_TARGET}")" || ks_re_offset=""
     if [ -n "${ks_re_offset}" ]; then
       KS_REASON="holds data at byte ${ks_re_offset}, past its real size"
@@ -85,6 +85,7 @@ ks_process() {
   KS_ROM_KIND=""
   KS_ROM_TARGET=0
   KS_NEW_NAME=""
+  KS_ROM_STRICT=no
   ks_rom_read "$1"
   if [ "${KS_RENAME}" = yes ]; then
     ks_rename_process "$1"

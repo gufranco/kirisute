@@ -35,11 +35,26 @@ within its declared size; a console NAND image is refused. A 3DS executable
 carrying the NCCH magic is cut to the size its header declares.
 .PP
 A PSP ISO is cut to the volume its ISO 9660 primary volume descriptor declares,
-the volume space size times the logical block size. It must have a
+the volume space size times the logical block size. Its descriptor must name
+the system PSP GAME, UMD VIDEO or UMD AUDIO, or its root must hold a
 .I PSP_GAME
-folder in its root; its title and disc ID come from
+folder; its title and disc ID come from
 .IR PSP_GAME/PARAM.SFO ,
-when it has one.
+when it has one. A dump can hold sectors past the declared volume, and a game
+can read sectors outside its files, so the cut is made only when every byte
+past the volume is 00 or FF, with or without
+.BR \-\-verify .
+Nothing inside the volume is removed, update data and padding files included. A
+development DVD-R image holding
+.I USER_L0.IMG
+and
+.I USER_L1.IMG
+is refused until the two layers are joined, layer 0 first.
+.PP
+A trimmed file no longer matches the checksum of an untrimmed dump in
+databases such as Redump or No-Intro;
+.B \-\-backup
+keeps the original.
 .PP
 A file given by name is read by its extension:
 .I .gba
