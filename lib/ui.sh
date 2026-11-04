@@ -218,7 +218,7 @@ ks_ui_table() {
 }
 
 ks_ui_table_body() {
-  awk -F '\t' -v acc="${KS_UI_ACCENT}" -v ok="${KS_UI_OK}" -v warn="${KS_UI_WARN}" \
+  LC_ALL=C awk -F '\t' -v acc="${KS_UI_ACCENT}" -v ok="${KS_UI_OK}" -v warn="${KS_UI_WARN}" \
     -v bad="${KS_UI_ERR}" -v txt="${KS_UI_TEXT}" -v mut="${KS_UI_MUTED}" -v dash="$1" \
     -f "${KS_LIB}/table.awk"
 }
