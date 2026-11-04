@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/gufranco/kirisute/compare/v1.2.0...v1.2.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* let the terminal wrap long messages ([e6b2803](https://github.com/gufranco/kirisute/commit/e6b28035e9f78a5ec3d29d101292b85996eb3352))
+* **ui:** line up table cells with wide letters ([7bdf2ef](https://github.com/gufranco/kirisute/commit/7bdf2ef4549418b6c8c318c9467ad34e843a7c8e))
+
 # [1.2.0](https://github.com/gufranco/kirisute/compare/v1.1.0...v1.2.0) (2026-11-04)
 
 
