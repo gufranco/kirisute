@@ -16,3 +16,4 @@ complete -c kirisute -l format -x -a 'cso cso2 zso' -d 'compressed format, defau
 complete -c kirisute -l block -x -a '2048 4096 8192 16384' -d 'block size in bytes, default 8192'
 complete -c kirisute -l lz4-cost -x -d 'percent a CSO v2 block may grow to use LZ4, default 0'
 complete -c kirisute -l best -d 'one more slow trial: Zopfli for CSO, brute-force LZ4 for ZSO'
+complete -c kirisute -l theme -r -a 'kodougu catppuccin-mocha catppuccin-latte dracula nord gruvbox tokyo-night mono' -d 'colours of the terminal interface'

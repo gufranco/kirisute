@@ -14,6 +14,8 @@ KS_LIB="$(cd "${ks_self%/*}/../lib" && pwd)" || exit 1
 
 # shellcheck source=SCRIPTDIR/../lib/core.sh
 . "${KS_LIB}/core.sh"
+# shellcheck source=SCRIPTDIR/../lib/ui.sh
+. "${KS_LIB}/ui.sh"
 # shellcheck source=SCRIPTDIR/../lib/cli.sh
 . "${KS_LIB}/cli.sh"
 # shellcheck source=SCRIPTDIR/../lib/doctor.sh
@@ -46,6 +48,44 @@ KS_LIB="$(cd "${ks_self%/*}/../lib" && pwd)" || exit 1
 . "${KS_LIB}/run.sh"
 
 ks_main() {
+  ks_mn_count=$#
+  ks_mn_literal=no
+  while [ "${ks_mn_count}" -gt 0 ]; do
+    ks_mn_arg="$1"
+    shift
+    ks_mn_count=$((ks_mn_count - 1))
+    case "${ks_mn_literal}:${ks_mn_arg}" in
+    no:--) ks_mn_literal=yes ;;
+    no:--theme=*)
+      KS_THEME="${ks_mn_arg#--theme=}"
+      continue
+      ;;
+    no:--theme)
+      [ "${ks_mn_count}" -gt 0 ] || ks_main_stop "option '--theme' needs a value"
+      KS_THEME="$1"
+      shift
+      ks_mn_count=$((ks_mn_count - 1))
+      continue
+      ;;
+    *) ;;
+    esac
+    set -- "$@" "${ks_mn_arg}"
+  done
+  ks_ui_setup || ks_main_fail "${KS_UI_PROBLEM}"
+  ks_dispatch "$@"
+}
+
+ks_main_stop() {
+  ks_cli_hint "$1"
+  exit 1
+}
+
+ks_main_fail() {
+  ks_error "$1"
+  exit 1
+}
+
+ks_dispatch() {
   case "${1:-}" in
   help | -h | --help) ks_usage ;;
   version | -V | --version) ks_cli_version ;;

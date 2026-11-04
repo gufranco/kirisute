@@ -3,6 +3,8 @@
 KIRISUTE_TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "${KIRISUTE_TESTS_DIR}/.." && pwd)"
 export KIRISUTE_TESTS_DIR REPO_DIR
+PATH="${KIRISUTE_TESTS_DIR}/bin:${PATH}"
+export PATH
 
 ks_test_setup() {
   WORK="$(mktemp -d "${BATS_TMPDIR:-/tmp}/ks.XXXXXX")"

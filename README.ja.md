@@ -24,6 +24,10 @@
 
 ---
 
+<p align="center">
+  <img src="screens/hero.gif" alt="ターミナルで実行した kirisute：最初の入力から結果まで" width="800">
+</p>
+
 ```console
 $ kirisute --backup download-play.nds advance.gba cartridge.3ds umd.iso notes.nds
 
@@ -49,6 +53,7 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 
 | ツール | 用途 | インストール |
 |:-------|:-----|:-------------|
+| [`gum`](https://github.com/charmbracelet/gum) | 端末の画面：メニュー、入力、表、配色 | `brew install gum`。Homebrewのformulaが自動でインストールします |
 | `awk`、`od`、`head`、`tail`、`tr`、`wc` | ヘッダーを読み、ROM のデータを写します | Linux と macOS に標準で入っています |
 | `mktemp`、`mv`、`stat`、`chmod`、`rm` | 切り詰めたコピーを ROM の隣に書き、差し替えます | Linux と macOS に標準で入っています |
 | `cmp` | 圧縮したコピーが元に戻ることを確かめます | Linux と macOS に標準で入っています |
@@ -74,6 +79,7 @@ make install
 
 ```console
 $ kirisute doctor
+gum                ok       /opt/homebrew/bin/gum
 awk                ok       /opt/homebrew/opt/gawk/libexec/gnubin/awk, gnu 5.4.1
 od                 ok       /usr/bin/od, bsd
 head               ok       /usr/bin/head, bsd
@@ -108,6 +114,7 @@ maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 | `--backup`、`--no-backup` | 元のファイルを `<rom>.bak` として残します |
 | `--recursive` | すべてのサブフォルダからも ROM ファイルを探します |
 | `--json` | 結果を 1 つの JSON オブジェクトで出力します。スクリプト向けです |
+| `--theme <name>` | 端末の画面の配色 |
 
 `KIRISUTE_VERIFY=yes` と `KIRISUTE_BACKUP=yes` で `--verify` と `--backup` が既定になり、コマンドラインのオプションが優先されます。kirisute はファミリー共通のコマンドライン規約に従います。内容は [FAMILY.md](FAMILY.md) にあります。
 
@@ -117,6 +124,14 @@ kirisute --backup --verify game.nds      # 元を残し、詰め物にデータ�
 kirisute --recursive ~/roms              # ライブラリ全体を切り詰める
 kirisute rename --dry-run *.gba          # 各 ROM が付ける名前を確かめる
 kirisute compress game.iso               # ARK-4 と ARK-5 向けに game.cso を書く
+```
+
+### テーマ
+
+`gum`がインストールされた端末では、kirisuteはメニュー、入力、表、メッセージをgumで描きます。パイプやスクリプトでは、出力はプレーンテキストのままです。配色は`--theme`、なければ`KIRISUTE_THEME`、なければ`KODOUGU_THEME`で選びます。最後のものはkodouguのすべてのツールが共有します：`kodougu` （既定）、`catppuccin-mocha`、`catppuccin-latte`、`dracula`、`nord`、`gruvbox`、`tokyo-night`、`mono`。`KODOUGU_ACCENT=#RRGGBB`はアクセント色だけを置き換え、`NO_COLOR`は色を消します。
+
+```bash
+export KODOUGU_THEME=catppuccin-mocha
 ```
 
 <a id="what-is-kept"></a>
@@ -205,6 +220,39 @@ Dry run: 1 ROM would be compressed. Nothing was changed.
 
 すべて POSIX `sh` で書かれ、ShellCheck `-o all` の指摘はゼロです。テストは macOS では `/bin/sh`、`dash`、システムの bash 3.2 と zsh、Homebrew の最新の bash と zsh で、Ubuntu では `dash`、`bash`、`bash --posix`、`zsh` で実行します。CI はファミリーの 6 つのツールセットで繰り返します。Linux の uutils、GNU、BusyBox、macOS 標準のツール、その Homebrew の新しいビルド、Homebrew の uutils です。`kirisute doctor` は各ツールの種類とバージョンを示すので、バグ報告からどのツールが動いたかがわかります。
 
+<a id="screens"></a>
+
+## 画面
+
+<details>
+<summary><code>make screens</code> で実際の実行から録画したすべての画面</summary>
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="screens/confirm.png" alt="kirisute: 概要と確認"><br><sub>概要と確認</sub></td>
+<td width="50%" valign="top"><img src="screens/result.png" alt="kirisute: 結果"><br><sub>結果</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/info.png" alt="kirisute: --info は ROM のヘッダーを表示"><br><sub>--info は ROM のヘッダーを表示</sub></td>
+<td width="50%" valign="top"><img src="screens/dry-run.png" alt="kirisute: 何も変えないドライラン"><br><sub>何も変えないドライラン</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/rename.png" alt="kirisute: ヘッダーに基づく ROM の名前変更"><br><sub>ヘッダーに基づく ROM の名前変更</sub></td>
+<td width="50%" valign="top"><img src="screens/compress.png" alt="kirisute: PSP ディスクイメージの圧縮"><br><sub>PSP ディスクイメージの圧縮</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/error.png" alt="kirisute: エラー"><br><sub>エラー</sub></td>
+<td width="50%" valign="top"><img src="screens/doctor.png" alt="kirisute: doctor が必要なツールをすべて確認"><br><sub>doctor が必要なツールをすべて確認</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/themes.png" alt="kirisute: 6 つのテーマでのバージョン表示"><br><sub>6 つのテーマでのバージョン表示</sub></td>
+<td width="50%" valign="top"><img src="screens/help.png" alt="kirisute: ヘルプ"><br><sub>ヘルプ</sub></td>
+</tr>
+</table>
+
+</details>
+
 <a id="development"></a>
 
 ## 開発
@@ -217,6 +265,7 @@ Dry run: 1 ROM would be compressed. Nothing was changed.
 | `make test-all` | すべてのシェルで同じテストを実行します。macOS では bash と zsh の両方のビルドを含みます |
 | `make test-linux` | Ubuntu コンテナで同じテストを実行します |
 | `make coverage` | この Mac と Ubuntu コンテナでの bashcov 行カバレッジを統合し、CI と同じ 100% のゲートをかけます |
+| `make screens` | macOS で、README の画面を実物のツールから VHS で録画します |
 
 テストは本物のファイルを切り詰めます。システムごとのビルダーが、ヘッダーとチェックサムの正しいファイルを作ります。DS は [`test/rom.bash`](test/rom.bash)、ほかに [`test/gba.bash`](test/gba.bash)、3DS は [`test/ctr.bash`](test/ctr.bash)、[`test/psp.bash`](test/psp.bash) です。ロゴの画像には代わりのデータを使うので、リポジトリに任天堂やソニーのデータはありません。注入するのは失敗だけで、`PATH` 上の小さなラッパーを通します。`main` への push で CI が通ると semantic-release が動き、`feat` か `fix` のコミットがリリースを公開して、[`lib/core.sh`](lib/core.sh) の `KIRISUTE_VERSION` と CHANGELOG を更新し、Homebrew の formula を上げます。
 

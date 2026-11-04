@@ -5,6 +5,10 @@ _kirisute() {
   local cur prev words
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD - 1]}"
+  if [[ "${COMP_WORDS[COMP_CWORD - 1]}" == "--theme" ]]; then
+    COMPREPLY=($(compgen -W "kodougu catppuccin-mocha catppuccin-latte dracula nord gruvbox tokyo-night mono" -- "${COMP_WORDS[COMP_CWORD]}"))
+    return
+  fi
   case "${prev}" in
   --format)
     COMPREPLY=($(compgen -W "cso cso2 zso" -- "${cur}"))
@@ -21,7 +25,7 @@ _kirisute() {
   *) ;;
   esac
   if [[ "${cur}" == -* ]]; then
-    COMPREPLY=($(compgen -W "--dry-run --info --verify --no-verify --backup --no-backup --recursive --json --format --block --lz4-cost --best" -- "${cur}"))
+    COMPREPLY=($(compgen -W "--dry-run --info --verify --no-verify --backup --no-backup --recursive --json --format --block --lz4-cost --best --theme" -- "${cur}"))
     return
   fi
   words="$(compgen -f -- "${cur}" || true)"

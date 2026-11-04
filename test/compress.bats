@@ -322,7 +322,8 @@ ks_test_decompresses_to() {
   # Assert
   [[ "${status}" -eq 0 ]]
   [[ -f "${WORK}/game.cso" ]]
-  [[ "${output}" == *"Files:  1 ROM, 256.0 KiB"* ]]
+  [[ "${output}" == *"Files:  1 disc image, 256.0 KiB"* ]]
+  [[ "${output}" == *"Compressed 1 disc image and saved"* ]]
 }
 
 @test "an existing copy is never overwritten" {
@@ -351,7 +352,7 @@ ks_test_decompresses_to() {
   [[ "${status}" -eq 0 ]]
   [[ ! -e "${copy}" ]]
   [[ "${output}" == *"        dry run: list each copy and change nothing"* ]]
-  [[ "${output}" == *"Would compress ${ISO} to game.cso as CSO v2."$'\n'"Dry run: 1 ROM would be compressed. Nothing was changed." ]]
+  [[ "${output}" == *"Would compress ${ISO} to game.cso as CSO v2."$'\n'"Dry run: 1 disc image would be compressed. Nothing was changed." ]]
 }
 
 @test "compress --json reports each copy" {

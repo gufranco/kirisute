@@ -24,6 +24,10 @@
 
 ---
 
+<p align="center">
+  <img src="screens/hero.gif" alt="在终端中运行的 kirisute：从第一个输入到结果" width="800">
+</p>
+
 ```console
 $ kirisute --backup download-play.nds advance.gba cartridge.3ds umd.iso notes.nds
 
@@ -49,6 +53,7 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 
 | 工具 | 用途 | 安装 |
 |:-----|:-----|:-----|
+| [`gum`](https://github.com/charmbracelet/gum) | 终端界面：菜单、输入、表格和配色 | `brew install gum`。Homebrew formula 会自动安装 |
 | `awk`、`od`、`head`、`tail`、`tr`、`wc` | 读取头部并复制 ROM 的数据 | Linux 和 macOS 已预装 |
 | `mktemp`、`mv`、`stat`、`chmod`、`rm` | 在 ROM 旁边写入裁剪后的副本并替换 | Linux 和 macOS 已预装 |
 | `cmp` | 检查压缩副本能否解压回原文件 | Linux 和 macOS 已预装 |
@@ -74,6 +79,7 @@ make install
 
 ```console
 $ kirisute doctor
+gum                ok       /opt/homebrew/bin/gum
 awk                ok       /opt/homebrew/opt/gawk/libexec/gnubin/awk, gnu 5.4.1
 od                 ok       /usr/bin/od, bsd
 head               ok       /usr/bin/head, bsd
@@ -108,6 +114,7 @@ maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 | `--backup`、`--no-backup` | 把每个原文件保留为 `<rom>.bak` |
 | `--recursive` | 也在所有子文件夹中查找 ROM 文件 |
 | `--json` | 把结果输出为一个 JSON 对象，供脚本使用 |
+| `--theme <name>` | 终端界面的配色 |
 
 `KIRISUTE_VERIFY=yes` 和 `KIRISUTE_BACKUP=yes` 会让 `--verify` 和 `--backup` 成为默认；命令行上的选项优先。kirisute 遵循家族共享的命令行约定，内容见 [FAMILY.md](FAMILY.md)。
 
@@ -117,6 +124,14 @@ kirisute --backup --verify game.nds      # 保留原文件，填充中有数据�
 kirisute --recursive ~/roms              # 裁剪整个游戏库
 kirisute rename --dry-run *.gba          # 看看每个 ROM 会取什么名字
 kirisute compress game.iso               # 为 ARK-4 和 ARK-5 写出 game.cso
+```
+
+### 主题
+
+在装有 `gum` 的终端里，kirisute 用 gum 绘制菜单、输入、表格和消息；在管道或脚本中，输出仍是纯文本。配色依次由 `--theme`、`KIRISUTE_THEME`、`KODOUGU_THEME` 决定，最后一个由所有 kodougu 工具共用：`kodougu`（默认）、`catppuccin-mocha`、`catppuccin-latte`、`dracula`、`nord`、`gruvbox`、`tokyo-night` 或 `mono`。`KODOUGU_ACCENT=#RRGGBB` 只替换强调色，`NO_COLOR` 关闭颜色。
+
+```bash
+export KODOUGU_THEME=catppuccin-mocha
 ```
 
 <a id="what-is-kept"></a>
@@ -205,6 +220,39 @@ Dry run: 1 ROM would be compressed. Nothing was changed.
 
 全部使用 POSIX `sh` 编写，ShellCheck `-o all` 零警告。测试在 macOS 上于 `/bin/sh`、`dash`、系统自带的 bash 3.2 和 zsh、Homebrew 最新的 bash 和 zsh 下运行，在 Ubuntu 上于 `dash`、`bash`、`bash --posix` 和 `zsh` 下运行。CI 会在家族的六种工具集上重复这些测试：Linux 的 uutils、GNU 或 BusyBox 工具，以及 macOS 自带的工具、Homebrew 的较新版本或 Homebrew 的 uutils 工具。`kirisute doctor` 会写出每个工具的种类与版本，让错误报告说明运行的是哪些工具。
 
+<a id="screens"></a>
+
+## 界面
+
+<details>
+<summary>全部界面，均由 <code>make screens</code> 录自真实运行</summary>
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="screens/confirm.png" alt="kirisute: 概要与确认"><br><sub>概要与确认</sub></td>
+<td width="50%" valign="top"><img src="screens/result.png" alt="kirisute: 结果"><br><sub>结果</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/info.png" alt="kirisute: --info 显示 ROM 的文件头"><br><sub>--info 显示 ROM 的文件头</sub></td>
+<td width="50%" valign="top"><img src="screens/dry-run.png" alt="kirisute: 不做任何更改的试运行"><br><sub>不做任何更改的试运行</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/rename.png" alt="kirisute: 按文件头重命名的 ROM"><br><sub>按文件头重命名的 ROM</sub></td>
+<td width="50%" valign="top"><img src="screens/compress.png" alt="kirisute: 压缩后的 PSP 光盘镜像"><br><sub>压缩后的 PSP 光盘镜像</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/error.png" alt="kirisute: 错误"><br><sub>错误</sub></td>
+<td width="50%" valign="top"><img src="screens/doctor.png" alt="kirisute: doctor 检查所需的每个工具"><br><sub>doctor 检查所需的每个工具</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/themes.png" alt="kirisute: 六种主题下的版本标记"><br><sub>六种主题下的版本标记</sub></td>
+<td width="50%" valign="top"><img src="screens/help.png" alt="kirisute: 帮助页"><br><sub>帮助页</sub></td>
+</tr>
+</table>
+
+</details>
+
 <a id="development"></a>
 
 ## 开发
@@ -217,6 +265,7 @@ Dry run: 1 ROM would be compressed. Nothing was changed.
 | `make test-all` | 在每种 shell 下运行同样的测试，macOS 上包括 bash 和 zsh 的两个版本 |
 | `make test-linux` | 在 Ubuntu 容器中运行同样的测试 |
 | `make coverage` | 合并本机与 Ubuntu 容器中的 bashcov 行覆盖率，并执行与 CI 相同的 100% 门槛 |
+| `make screens` | 在 macOS 上用 VHS 从真实工具录制 README 的界面 |
 
 测试裁剪的是真实文件。每个系统都有一个生成器，写出头部和校验和都正确的文件：DS 用 [`test/rom.bash`](test/rom.bash)，另有 [`test/gba.bash`](test/gba.bash)、3DS 用 [`test/ctr.bash`](test/ctr.bash) 和 [`test/psp.bash`](test/psp.bash)。标志图像用替代数据，所以仓库中没有任天堂或索尼的数据。只有失败是注入的，通过 `PATH` 上的小包装脚本实现。推送到 `main` 且 CI 通过后，semantic-release 会运行：`feat` 或 `fix` 提交会发布新版本，更新 [`lib/core.sh`](lib/core.sh) 中的 `KIRISUTE_VERSION` 和 CHANGELOG，并更新 Homebrew formula。
 

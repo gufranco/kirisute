@@ -127,6 +127,20 @@ written, because no open JSO writer exists. It takes
 .B \-\-json
 and the options under COMPRESS.
 .TP
+.BI \-\-theme " name"
+Colours of the terminal interface:
+.BR kodougu ,
+.BR catppuccin\-mocha ,
+.BR catppuccin\-latte ,
+.BR dracula ,
+.BR nord ,
+.BR gruvbox ,
+.B tokyo\-night
+or
+.BR mono .
+The default is
+.BR kodougu .
+.TP
 .B doctor
 List the tools kirisute needs, with the flavor and version of each, maxcso
 included. Exits non-zero only when one is missing.
@@ -222,6 +236,24 @@ The default for
 yes or no, the default for
 .BR \-\-best ,
 no unless set.
+.TP
+.B KIRISUTE_THEME
+The theme when
+.B \-\-theme
+is not given.
+.TP
+.B KODOUGU_THEME
+The theme of every kodougu tool, when neither
+.B \-\-theme
+nor
+.B KIRISUTE_THEME
+is set.
+.TP
+.B KODOUGU_ACCENT
+A colour such as #CBA6F7 that replaces the accent of the theme.
+.TP
+.B NO_COLOR
+Turns colour off in every theme.
 .SH EXIT STATUS
 0 when every ROM was trimmed, renamed or compressed, or already at its real size
 or name. 1 when a file was skipped or could not be trimmed, renamed or

@@ -4,6 +4,14 @@
 . "${KS_LIB:?}/state.sh"
 
 ks_usage() {
+  if ks_ui_out; then
+    ks_usage_text | ks_ui_markdown | ks_gum format --theme "${KS_UI_HELP}"
+    return 0
+  fi
+  ks_usage_text
+}
+
+ks_usage_text() {
   cat <<'USAGE'
 kirisute - cut GBA, DS, DSi and 3DS ROMs and PSP ISOs to their real size
 
@@ -30,6 +38,7 @@ options:
   --recursive                   look for ROM files in every subfolder too
   --json                        print the result as one JSON object, for
                                 scripts
+  --theme NAME                  colours of the terminal interface, see notes
 
 compress:
   --format cso|cso2|zso         CSO v1, CSO v2 or ZSO (default cso2); CSO v2
@@ -76,6 +85,12 @@ notes:
   doctor, version, rename or compress is trimmed by giving its path, such as
   ./help.
 
+  On a terminal with gum installed, kirisute draws its prompts, summary and
+  results with gum. --theme, else KIRISUTE_THEME, else KODOUGU_THEME picks the
+  colours: kodougu, catppuccin-mocha, catppuccin-latte, dracula, nord,
+  gruvbox, tokyo-night or mono. KODOUGU_ACCENT=#RRGGBB replaces only the
+  accent, and NO_COLOR turns colour off.
+
 examples:
   kirisute --dry-run *.nds *.3ds
   kirisute --backup --verify game.nds
@@ -87,12 +102,19 @@ USAGE
 }
 
 ks_cli_hint() {
-  ks_say 0 "${KS_PROG}: $1. run '${KS_PROG} help' for usage." >&2
+  ks_error "$1. run '${KS_PROG} help' for usage."
 }
 
 ks_cli_version() {
-  ks_version
   ks_cv_platform="$(uname -sr)" || ks_cv_platform="unknown"
+  if ks_ui_out; then
+    ks_cv_text="$(ks_version)"
+    ks_cv_badge="$(ks_ui_badge "${KS_UI_ACCENT}" "${ks_cv_text}")"
+    ks_cv_chip="$(ks_ui_chip "platform ${ks_cv_platform}")"
+    ks_gum join --horizontal "${ks_cv_badge}" " " "${ks_cv_chip}"
+    return 0
+  fi
+  ks_version
   printf 'platform: %s\n' "${ks_cv_platform}"
 }
 
@@ -102,6 +124,11 @@ ks_interactive() {
 }
 
 ks_prompt() {
+  if ks_ui_prompts; then
+    ks_pd_answer="$(ks_ui_input "$1" "$2")" || return 1
+    printf '%s\n' "${ks_pd_answer:-$2}"
+    return 0
+  fi
   printf '%s [%s]: ' "$1" "$2" >&2
   ks_pr_answer=""
   IFS= read -r ks_pr_answer || [ -n "${ks_pr_answer}" ] || return 1

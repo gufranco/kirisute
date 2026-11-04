@@ -24,6 +24,10 @@ A cartridge dump is as large as the chip it came from, and a disc image can carr
 
 ---
 
+<p align="center">
+  <img src="screens/hero.gif" alt="kirisute running in a terminal, from the first prompt to the result" width="800">
+</p>
+
 ```console
 $ kirisute --backup download-play.nds advance.gba cartridge.3ds umd.iso notes.nds
 
@@ -49,6 +53,7 @@ Trimmed 4 of 5 ROMs and saved 148.0 MiB.
 
 | Tool | Why | Install |
 |:-----|:----|:--------|
+| [`gum`](https://github.com/charmbracelet/gum) | The terminal interface: menus, prompts, tables and colours | `brew install gum`. Installed automatically by the Homebrew formula |
 | `awk`, `od`, `head`, `tail`, `tr`, `wc` | Read the header and copy the ROM's data | Part of every Linux and macOS system |
 | `mktemp`, `mv`, `stat`, `chmod`, `rm` | Write the trimmed copy beside the ROM and swap it in | Part of every Linux and macOS system |
 | `cmp` | Check that a compressed copy decompresses to the original | Part of every Linux and macOS system |
@@ -74,6 +79,7 @@ make install
 
 ```console
 $ kirisute doctor
+gum                ok       /opt/homebrew/bin/gum
 awk                ok       /opt/homebrew/opt/gawk/libexec/gnubin/awk, gnu 5.4.1
 od                 ok       /usr/bin/od, bsd
 head               ok       /usr/bin/head, bsd
@@ -108,6 +114,7 @@ maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 | `--backup`, `--no-backup` | Keep each original as `<rom>.bak` |
 | `--recursive` | Look for ROM files in every subfolder too |
 | `--json` | Print the result as one JSON object, for scripts |
+| `--theme <name>` | Colours of the terminal interface |
 
 `KIRISUTE_VERIFY=yes` and `KIRISUTE_BACKUP=yes` make `--verify` and `--backup` the default; an option on the command line wins. kirisute follows the shared command-line contract of its family, described in [FAMILY.md](FAMILY.md).
 
@@ -117,6 +124,14 @@ kirisute --backup --verify game.nds      # keep the original, refuse if the padd
 kirisute --recursive ~/roms              # trim a whole library
 kirisute rename --dry-run *.gba          # see the name each ROM would take
 kirisute compress game.iso               # write game.cso for ARK-4 and ARK-5
+```
+
+### Themes
+
+On a terminal with `gum` installed, kirisute draws its menus, prompts, tables and messages with gum; in a pipe or a script the output stays plain text. `--theme`, else `KIRISUTE_THEME`, else `KODOUGU_THEME` picks the colours, the last one shared by every kodougu tool: `kodougu` (default), `catppuccin-mocha`, `catppuccin-latte`, `dracula`, `nord`, `gruvbox`, `tokyo-night` or `mono`. `KODOUGU_ACCENT=#RRGGBB` replaces only the accent, and `NO_COLOR` turns colour off.
+
+```bash
+export KODOUGU_THEME=catppuccin-mocha
 ```
 
 <a id="what-is-kept"></a>
@@ -205,6 +220,39 @@ Dry run: 1 ROM would be compressed. Nothing was changed.
 
 Everything is POSIX `sh` with ShellCheck `-o all` at zero findings. The suites run on macOS under `/bin/sh`, `dash`, the system's bash 3.2 and zsh, and Homebrew's current bash and zsh, and on Ubuntu under `dash`, `bash`, `bash --posix` and `zsh`. CI repeats them on the family's six toolsets: Linux with uutils, GNU or BusyBox tools, and macOS with the tools it ships, Homebrew's newer builds of them, or Homebrew's uutils tools. `kirisute doctor` names the flavor and version of each tool, so a bug report says which tools ran.
 
+<a id="screens"></a>
+
+## Screens
+
+<details>
+<summary>Every screen, recorded from a real run with <code>make screens</code></summary>
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="screens/confirm.png" alt="kirisute: The summary, then the confirmation"><br><sub>The summary, then the confirmation</sub></td>
+<td width="50%" valign="top"><img src="screens/result.png" alt="kirisute: The result"><br><sub>The result</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/info.png" alt="kirisute: --info prints a ROM's header"><br><sub>--info prints a ROM's header</sub></td>
+<td width="50%" valign="top"><img src="screens/dry-run.png" alt="kirisute: A dry run, changing nothing"><br><sub>A dry run, changing nothing</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/rename.png" alt="kirisute: A ROM renamed after its header"><br><sub>A ROM renamed after its header</sub></td>
+<td width="50%" valign="top"><img src="screens/compress.png" alt="kirisute: A PSP disc image compressed"><br><sub>A PSP disc image compressed</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/error.png" alt="kirisute: An error"><br><sub>An error</sub></td>
+<td width="50%" valign="top"><img src="screens/doctor.png" alt="kirisute: doctor checks every tool it needs"><br><sub>doctor checks every tool it needs</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/themes.png" alt="kirisute: The version badge in six themes"><br><sub>The version badge in six themes</sub></td>
+<td width="50%" valign="top"><img src="screens/help.png" alt="kirisute: The help page"><br><sub>The help page</sub></td>
+</tr>
+</table>
+
+</details>
+
 <a id="development"></a>
 
 ## Development
@@ -217,6 +265,7 @@ Everything is POSIX `sh` with ShellCheck `-o all` at zero findings. The suites r
 | `make test-all` | The same tests under every shell, both builds of bash and zsh included on macOS |
 | `make test-linux` | The same tests in an Ubuntu container |
 | `make coverage` | bashcov line coverage on this Mac and in the Ubuntu container, merged, with the 100% gate CI enforces |
+| `make screens` | Record the README screens from the real tool with VHS, on macOS |
 
 The tests trim real files. One builder per system writes them with valid headers and checksums: [`test/rom.bash`](test/rom.bash) for DS, [`test/gba.bash`](test/gba.bash), [`test/ctr.bash`](test/ctr.bash) for 3DS and [`test/psp.bash`](test/psp.bash). They use a stand-in for the logo bitmap, so no Nintendo or Sony data is in the repository. Only failures are injected, through small wrappers on `PATH`. Once CI passes on a push to `main`, semantic-release runs: a `feat` or `fix` commit publishes a release, updates `KIRISUTE_VERSION` in [`lib/core.sh`](lib/core.sh) and the CHANGELOG, and bumps the Homebrew formula.
 

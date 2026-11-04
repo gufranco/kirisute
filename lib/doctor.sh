@@ -4,7 +4,39 @@
 . "${KS_LIB:?}/state.sh"
 
 ks_doctor_row() {
+  if ks_ui_out; then
+    case "$2" in
+    ok) ks_dw_state="@ok:ok" ;;
+    *) ks_dw_state="@bad:$2" ;;
+    esac
+    KS_DOCTOR_ROWS="${KS_DOCTOR_ROWS}$1	${ks_dw_state}	$3
+"
+    return 0
+  fi
   printf '%-18s %-8s %s\n' "$1" "$2" "$3"
+}
+
+ks_doctor_report() {
+  if ! ks_ui_out; then
+    return 0
+  fi
+  printf 'Tool\tState\tDetail\n%s' "${KS_DOCTOR_ROWS}" | ks_ui_table
+  if [ "$1" -ne 0 ]; then
+    ks_ui_log ERROR "a required tool is missing. install it and run kirisute doctor again."
+    return 0
+  fi
+  ks_ui_done "Ready. Every tool kirisute needs is here."
+}
+
+ks_doctor_gum() {
+  ks_dg_found="$(command -v gum 2>/dev/null || true)"
+  if [ -z "${ks_dg_found}" ]; then
+    ks_doctor_row gum missing "install with: brew install gum, or see https://github.com/charmbracelet/gum"
+    return 1
+  fi
+  ks_dg_raw="$(gum --version 2>/dev/null || true)"
+  ks_dg_version="$(ks_flavor_version "${ks_dg_raw}")"
+  ks_doctor_row gum ok "${ks_dg_found}${ks_dg_version:+, ${ks_dg_version}}"
 }
 
 ks_flavor_version() {
@@ -75,9 +107,11 @@ ks_doctor_maxcso() {
 
 ks_doctor() {
   ks_dr_status=0
+  ks_doctor_gum || ks_dr_status=1
   for ks_dr_tool in awk od head tail tr wc mktemp mv stat chmod rm cmp; do
     ks_doctor_tool "${ks_dr_tool}" || ks_dr_status=1
   done
   ks_doctor_maxcso || ks_dr_status=1
+  ks_doctor_report "${ks_dr_status}"
   return "${ks_dr_status}"
 }

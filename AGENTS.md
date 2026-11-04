@@ -19,8 +19,9 @@ Guidance for anyone, human or agent, changing kirisute. What kirisute is and how
 ## Names
 
 - Globals carry `KS_`; function-scoped variables carry a per-function `ks_` prefix.
-- Settings come from `KIRISUTE_VERIFY`, `KIRISUTE_BACKUP`, `KIRISUTE_FORMAT`, `KIRISUTE_BLOCK`, `KIRISUTE_LZ4_COST` and `KIRISUTE_BEST`; test switches are `KIRISUTE_TERMINAL`, `KIRISUTE_INTERACTIVE`, `KIRISUTE_OS`, `KIRISUTE_TEST_SHELLS`, `KIRISUTE_TEST_JOBS`, `KIRISUTE_TEST_RECORD` and `KIRISUTE_TEST_IMAGE`.
-- Output goes through `ks_say`, `ks_error` and `ks_warning`.
+- Settings come from `KIRISUTE_VERIFY`, `KIRISUTE_BACKUP`, `KIRISUTE_FORMAT`, `KIRISUTE_BLOCK`, `KIRISUTE_LZ4_COST` and `KIRISUTE_BEST`; test switches are `KIRISUTE_TERMINAL`, `KIRISUTE_INTERACTIVE`, `KIRISUTE_OS`, `KIRISUTE_TEST_SHELLS`, `KIRISUTE_TEST_JOBS`, `KIRISUTE_TEST_RECORD`, `KIRISUTE_TEST_IMAGE`, `KIRISUTE_TEST_GUM`, `KIRISUTE_TEST_GUM_LOG`, `KIRISUTE_TEST_GUM_ANSWERS` and `KIRISUTE_TEST_GUM_SPIN`.
+- Output goes through `ks_say`, `ks_error` and `ks_warning`, which hand over to the `ks_ui_` helpers in [`lib/ui.sh`](lib/ui.sh) where gum draws.
+- Where gum draws, a run that trims, renames or compresses asks to confirm after the summary; a dry run, `--info` and a run without a terminal never ask.
 
 ## Behaviour
 
@@ -52,6 +53,7 @@ Guidance for anyone, human or agent, changing kirisute. What kirisute is and how
 ## Release
 
 - `KIRISUTE_VERSION` lives in [`lib/core.sh`](lib/core.sh).
+- The tap's `Formula/kirisute.rb` depends on `gufranco/tap/maxcso` and `gum`.
 
 ## Gaps against FAMILY.md
 

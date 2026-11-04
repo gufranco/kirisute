@@ -47,10 +47,18 @@ ks_say() {
 }
 
 ks_warning() {
+  if ks_ui_err; then
+    ks_ui_log WARN "$*"
+    return 0
+  fi
   ks_say 0 "${KS_PROG}: warning: $*" >&2
 }
 
 ks_error() {
+  if ks_ui_err; then
+    ks_ui_log ERROR "$*"
+    return 0
+  fi
   ks_say 0 "${KS_PROG}: $*" >&2
 }
 

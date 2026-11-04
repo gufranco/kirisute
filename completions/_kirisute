@@ -24,6 +24,7 @@ _kirisute() {
     '--no-backup[keep no copy of the original]' \
     '--recursive[look for ROM files in every subfolder too]' \
     '--json[print the result as one JSON object, for scripts]' \
+    '--theme[colours of the terminal interface]:theme:(kodougu catppuccin-mocha catppuccin-latte dracula nord gruvbox tokyo-night mono)' \
     '--format[compressed format, default cso2]:format:(cso cso2 zso)' \
     '--block[block size in bytes, default 8192]:bytes:(2048 4096 8192 16384)' \
     '--lz4-cost[percent a CSO v2 block may grow to use LZ4, default 0]:percent:' \
