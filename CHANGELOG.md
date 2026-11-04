@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.2.0](https://github.com/gufranco/kirisute/compare/v1.1.0...v1.2.0) (2026-11-04)
+
+
+### Features
+
+* draw the terminal interface with gum ([12937f3](https://github.com/gufranco/kirisute/commit/12937f3887f1074fa2188e6c911a5b995eaa5909))
+
 # [1.1.0](https://github.com/gufranco/kirisute/compare/v1.0.0...v1.1.0) (2026-11-02)
 
 
