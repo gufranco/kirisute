@@ -82,7 +82,7 @@ ks_cut() {
     ks_cu_verb="Would trim"
   fi
   ks_record "${ks_cu_status}" "" "$1"
-  [ "${KS_JSON}" = yes ] || ks_say 0 "${ks_cu_verb} $1 from ${ks_cu_before} to ${ks_cu_after}${ks_cu_keeps}."
+  [ "${KS_JSON}" = yes ] || ks_say "${ks_cu_verb} $1 from ${ks_cu_before} to ${ks_cu_after}${ks_cu_keeps}."
 }
 
 ks_process() {
@@ -108,7 +108,7 @@ ks_process() {
     KS_ALREADY=$((KS_ALREADY + 1))
     ks_record already "" "$1"
     ks_pr_size="$(ks_human "${KS_ROM_SIZE}")"
-    [ "${KS_JSON}" = yes ] || ks_say 0 "$1 is already at its real size, ${ks_pr_size}."
+    [ "${KS_JSON}" = yes ] || ks_say "$1 is already at its real size, ${ks_pr_size}."
     return 0
   fi
   if ! ks_ready "$1"; then
@@ -125,7 +125,7 @@ ks_show_info() {
   ks_si_size="$(ks_human "${KS_ROM_SIZE}")"
   ks_si_trim="$(ks_human "${KS_ROM_TARGET}")"
   ks_si_pad="$(ks_human "$((KS_ROM_SIZE - KS_ROM_TARGET))")"
-  ks_say 8 "File:   $1, ${ks_si_size}"
+  ks_say "File:   $1, ${ks_si_size}"
   [ -z "${KS_ROM_TITLE}" ] || printf 'Title:  %s\n' "${KS_ROM_TITLE}"
   [ -z "${KS_ROM_CODE}" ] || printf 'Code:   %s\n' "${KS_ROM_CODE}"
   ks_rom_info

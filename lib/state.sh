@@ -5,7 +5,6 @@ export LC_ALL
 
 : "${KS_LIB:=}"
 : "${KS_PROG:=kirisute}"
-: "${KS_WIDTH:=80}"
 : "${KS_TAB:=$(printf '\t')}"
 : "${KS_DRY_RUN:=no}"
 : "${KS_INFO:=no}"

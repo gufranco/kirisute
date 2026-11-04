@@ -9,41 +9,8 @@ ks_version() {
   printf '%s %s\n' "${KS_PROG}" "${KIRISUTE_VERSION}"
 }
 
-ks_wrap() {
-  awk -v width="${KS_WIDTH}" -v indent="$1" '
-    function pad(n,   s) {
-      s = ""
-      while (n-- > 0) { s = s " " }
-      return s
-    }
-    length($0) <= width { print; next }
-    {
-      match($0, /^ */)
-      n = split($0, word, " ")
-      out = substr($0, 1, RLENGTH) word[1]
-      for (i = 2; i <= n; i++) {
-        if (length(out) + 1 + length(word[i]) > width) {
-          print out
-          out = pad(indent) word[i]
-        } else {
-          out = out " " word[i]
-        }
-      }
-      print out
-    }'
-}
-
-ks_terminal() {
-  [ "${KIRISUTE_TERMINAL:-}" = 1 ] || [ -t 1 ]
-}
-
 ks_say() {
-  ks_sy_text="$2"
-  if [ "${#ks_sy_text}" -le "${KS_WIDTH}" ] || ! ks_terminal; then
-    printf '%s\n' "${ks_sy_text}"
-    return 0
-  fi
-  printf '%s\n' "${ks_sy_text}" | ks_wrap "$1"
+  printf '%s\n' "$1"
 }
 
 ks_warning() {
@@ -51,7 +18,7 @@ ks_warning() {
     ks_ui_log WARN "$*"
     return 0
   fi
-  ks_say 0 "${KS_PROG}: warning: $*" >&2
+  ks_say "${KS_PROG}: warning: $*" >&2
 }
 
 ks_error() {
@@ -59,7 +26,7 @@ ks_error() {
     ks_ui_log ERROR "$*"
     return 0
   fi
-  ks_say 0 "${KS_PROG}: $*" >&2
+  ks_say "${KS_PROG}: $*" >&2
 }
 
 ks_json_string() {

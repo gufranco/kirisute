@@ -96,7 +96,7 @@ ks_compress_done() {
   [ "${KS_JSON}" = no ] || return 0
   ks_cd_before="$(ks_human "${KS_ROM_SIZE}")"
   ks_cd_after="$(ks_human "${KS_OUTPUT_SIZE}")"
-  ks_say 0 "Compressed $1 to ${2##*/}, ${ks_cd_before} to ${ks_cd_after}."
+  ks_say "Compressed $1 to ${2##*/}, ${ks_cd_before} to ${ks_cd_after}."
 }
 
 ks_compress_process() {
@@ -119,7 +119,7 @@ ks_compress_process() {
     KS_DONE=$((KS_DONE + 1))
     ks_record would-compress "" "$1"
     ks_cp_label="$(ks_compress_label)"
-    [ "${KS_JSON}" = yes ] || ks_say 0 "Would compress $1 to ${ks_cp_out##*/} as ${ks_cp_label}."
+    [ "${KS_JSON}" = yes ] || ks_say "Would compress $1 to ${ks_cp_out##*/} as ${ks_cp_label}."
     return 0
   fi
   if ! ks_compress_write "$1" "${ks_cp_out}"; then

@@ -134,14 +134,8 @@ ks_ui_log() {
   WARN) ks_ul_colour="${KS_UI_WARN}" ;;
   *) ks_ul_colour="${KS_UI_OK}" ;;
   esac
-  ks_ul_lines=$(printf '%s kirisute: %s\n' "${ks_ul_level}" "${ks_ul_text}" | ks_wrap 2)
-  ks_ul_first=$(printf '%s\n' "${ks_ul_lines}" | sed -n '1p')
-  ks_ul_rest=$(printf '%s\n' "${ks_ul_lines}" | sed '1d')
   ks_ul_label=$(ks_ui_ink "${ks_ul_colour}" --bold -- "${ks_ul_level}")
-  printf '%s%s\n' "${ks_ul_label}" "${ks_ul_first#"${ks_ul_level}"}" >&2
-  if [ -n "${ks_ul_rest}" ]; then
-    printf '%s\n' "${ks_ul_rest}" >&2
-  fi
+  printf '%s kirisute: %s\n' "${ks_ul_label}" "${ks_ul_text}" >&2
 }
 
 ks_ui_choose() {

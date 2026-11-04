@@ -62,7 +62,7 @@ ks_rename_apply() {
     ks_ra_status=would-rename
   fi
   ks_record "${ks_ra_status}" "" "$1"
-  [ "${KS_JSON}" = yes ] || ks_say 0 "${ks_ra_verb} $1 to ${2##*/}."
+  [ "${KS_JSON}" = yes ] || ks_say "${ks_ra_verb} $1 to ${2##*/}."
 }
 
 ks_rename_process() {
@@ -80,7 +80,7 @@ ks_rename_process() {
   if [ "${ks_rp_new}" = "$1" ]; then
     KS_ALREADY=$((KS_ALREADY + 1))
     ks_record already "" "$1"
-    [ "${KS_JSON}" = yes ] || ks_say 0 "$1 is already named after its header."
+    [ "${KS_JSON}" = yes ] || ks_say "$1 is already named after its header."
     return 0
   fi
   ks_rename_apply "$1" "${ks_rp_new}"
