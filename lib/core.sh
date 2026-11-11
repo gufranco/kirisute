@@ -66,5 +66,5 @@ ks_human() {
 }
 
 ks_file_bytes() {
-  stat -c %s "$1" 2>/dev/null || stat -f %z "$1"
+  stat -c %s -- "$1" 2>/dev/null || stat -f %z -- "$1"
 }

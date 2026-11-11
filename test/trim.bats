@@ -464,7 +464,7 @@ teardown() {
 @test "a ROM is trimmed when no stat can read its permissions" {
   # Arrange
   ks_test_rom "${ROM}" plain 16384 0 65536
-  ks_test_shim stat 'exit 1'
+  ks_test_shim stat 'case "$*" in *%a* | *%Lp*) exit 1 ;; esac; exec "$REAL" "$@"'
 
   # Act
   run ks_test_run "${ROM}"
