@@ -150,3 +150,15 @@ flavor_of() {
   # Assert
   [[ "${output}" == "${expected}" ]]
 }
+
+@test "a file past 4 GiB reports its whole size" {
+  # Arrange
+  dd if=/dev/zero of="${WORK}/large.img" bs=1 count=0 seek=4915200123 2>/dev/null
+
+  # Act
+  run ks_test_call ks_file_bytes "${WORK}/large.img"
+
+  # Assert
+  [[ "${status}" -eq 0 ]]
+  [[ "${output}" == "4915200123" ]]
+}

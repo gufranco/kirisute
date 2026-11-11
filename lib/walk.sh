@@ -64,7 +64,7 @@ ks_visit() {
     ks_process "$2"
     return 0
   fi
-  ks_vi_size="$(wc -c <"$2" | tr -d ' ')"
+  ks_vi_size="$(ks_file_bytes "$2")"
   KS_FOUND=$((KS_FOUND + 1))
   KS_BYTES=$((KS_BYTES + ks_vi_size))
 }

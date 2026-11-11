@@ -44,7 +44,7 @@ ks_trim_copy() {
     ks_error "could not write the trimmed copy of $1, so it stays as it was."
     return 1
   fi
-  ks_tc_written="$(wc -c <"${KS_TMP}" | tr -d ' ')"
+  ks_tc_written="$(ks_file_bytes "${KS_TMP}")"
   [ "${ks_tc_written}" -eq "$2" ] && return 0
   ks_error "wrote ${ks_tc_written} of $2 bytes of $1, so it stays as it was."
   return 1

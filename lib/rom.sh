@@ -57,7 +57,7 @@ ks_rom_bytes() {
 
 ks_rom_read() {
   ks_rom_system "$1" || KS_SYSTEM="${KS_SYSTEM_DEFAULT}"
-  KS_ROM_SIZE="$(wc -c <"$1" | tr -d ' ')"
+  KS_ROM_SIZE="$(ks_file_bytes "$1")"
   "ks_${KS_SYSTEM}_read" "$1"
 }
 

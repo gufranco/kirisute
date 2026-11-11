@@ -89,7 +89,7 @@ ks_compress_write() {
 }
 
 ks_compress_done() {
-  KS_OUTPUT_SIZE="$(wc -c <"$2" | tr -d ' ')"
+  KS_OUTPUT_SIZE="$(ks_file_bytes "$2")"
   KS_DONE=$((KS_DONE + 1))
   KS_SAVED=$((KS_SAVED + KS_ROM_SIZE - KS_OUTPUT_SIZE))
   ks_record compressed "" "$1"
