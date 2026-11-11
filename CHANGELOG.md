@@ -1,5 +1,25 @@
 # Changelog
 
+# [2.0.0](https://github.com/gufranco/kirisute/compare/v1.2.1...v2.0.0) (2026-11-11)
+
+
+### Bug Fixes
+
+* read file sizes past 4 GiB under BusyBox ([91a81d7](https://github.com/gufranco/kirisute/commit/91a81d726e5bdaa76affd7f08390d3a658bc1a5b))
+* size a file whose name starts with a dash ([da622c5](https://github.com/gufranco/kirisute/commit/da622c591596304ad7d2b1698181331b216a1142))
+
+
+### Features
+
+* keep each original by default ([9d04efd](https://github.com/gufranco/kirisute/commit/9d04efdbb52aad39a32205bb9959e117c77916da))
+
+
+### BREAKING CHANGES
+
+* trimming without --backup now leaves ROM.bak beside
+each trimmed ROM; pass --no-backup or set KIRISUTE_BACKUP=no for the
+old behaviour.
+
 ## [1.2.1](https://github.com/gufranco/kirisute/compare/v1.2.0...v1.2.1) (2026-11-04)
 
 
