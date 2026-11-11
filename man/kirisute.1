@@ -56,8 +56,13 @@ is refused until the two layers are joined, layer 0 first.
 .PP
 A trimmed file no longer matches the checksum of an untrimmed dump in
 databases such as Redump or No-Intro;
-.B \-\-backup
-keeps the original.
+each original is kept as
+.IR rom .bak,
+or the first free
+.IR rom .bak. n ,
+unless
+.B \-\-no\-backup
+is given.
 .PP
 A file given by name is read by its extension:
 .I .gba
@@ -169,8 +174,12 @@ such byte.
 .TP
 .BR \-\-backup ", " \-\-no\-backup
 Keep each original as
-.IR rom .bak.
-A ROM that already has one stays as it is.
+.IR rom .bak,
+or the first free
+.IR rom .bak. n
+when that one exists. On by default; a ROM whose names up to
+.IR rom .bak.99
+are all taken stays as it is.
 .TP
 .B \-\-recursive
 Look for ROM files in every subfolder of each folder given.
@@ -215,7 +224,7 @@ no unless set.
 .B KIRISUTE_BACKUP
 yes or no, the default for
 .BR \-\-backup ,
-no unless set.
+yes unless set.
 .TP
 .B KIRISUTE_FORMAT
 The default for

@@ -1,6 +1,7 @@
 
 Files:  5 ROMs, 272.0 KiB
 Plan:   cut each ROM to the size its header declares
+        keep each original as <rom>.bak
         trim only a ROM whose padding is nothing but 00 or FF
         dry run: list each cut and change nothing
 

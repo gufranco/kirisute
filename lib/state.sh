@@ -11,6 +11,7 @@ export LC_ALL
 : "${KS_JSON:=no}"
 : "${KS_VERIFY:=}"
 : "${KS_BACKUP:=}"
+: "${KS_BACKUP_NAME:=}"
 : "${KS_RECURSIVE:=no}"
 : "${KS_MODE:=trim}"
 : "${KS_NEW_NAME:=}"

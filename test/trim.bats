@@ -23,7 +23,7 @@ teardown() {
   # Assert
   [[ "${status}" -eq 0 ]]
   ks_test_size_is "${ROM}" 16384
-  [[ "${output}" == *"Trimmed ${ROM} from 64.0 KiB to 16.0 KiB."$'\n'"Trimmed 1 ROM and saved 48.0 KiB." ]]
+  [[ "${output}" == *"Trimmed ${ROM} from 64.0 KiB to 16.0 KiB."$'\n'"The original of ${ROM} is kept as ${ROM}.bak."$'\n'"Trimmed 1 ROM and saved 48.0 KiB." ]]
 }
 
 @test "a ROM given by name is read as a DS ROM whatever its extension" {
@@ -263,19 +263,22 @@ teardown() {
   cmp "${original}" "${ROM}.bak"
 }
 
-@test "--backup keeps a ROM that already has a backup" {
+@test "--backup never overwrites an earlier backup" {
   # Arrange
   ks_test_rom "${ROM}" plain 16384 0 65536
   printf 'old' >"${ROM}.bak"
+  local original="${WORK}/original.nds"
+  cp "${ROM}" "${original}"
 
   # Act
   run ks_test_run --backup "${ROM}"
 
   # Assert
-  [[ "${status}" -eq 1 ]]
-  [[ "${output}" == *"${ROM} has a ${ROM}.bak already, so it stays as it is."* ]]
+  [[ "${status}" -eq 0 ]]
+  [[ "${output}" == *"The original of ${ROM} is kept as ${ROM}.bak.1."* ]]
   ks_test_size_is "${ROM}.bak" 3
-  ks_test_size_is "${ROM}" 65536
+  cmp "${original}" "${ROM}.bak.1"
+  ks_test_size_is "${ROM}" 16384
 }
 
 @test "--backup treats a dangling link where the backup goes as taken" {
@@ -287,8 +290,42 @@ teardown() {
   run ks_test_run --backup "${ROM}"
 
   # Assert
+  [[ "${status}" -eq 0 ]]
+  [[ -L "${ROM}.bak" ]]
+  ks_test_size_is "${ROM}.bak.1" 65536
+}
+
+@test "--backup keeps a ROM whose hundred backup names are all taken" {
+  # Arrange
+  ks_test_rom "${ROM}" plain 16384 0 65536
+  local count=1
+  : >"${ROM}.bak"
+  while [[ "${count}" -lt 100 ]]; do
+    : >"${ROM}.bak.${count}"
+    count=$((count + 1))
+  done
+
+  # Act
+  run ks_test_run --backup "${ROM}"
+
+  # Assert
   [[ "${status}" -eq 1 ]]
+  [[ "${output}" == *"${ROM} has ${ROM}.bak to ${ROM}.bak.99 already, so it stays as it is."* ]]
   ks_test_size_is "${ROM}" 65536
+}
+
+@test "a trim keeps the original as a backup by default" {
+  # Arrange
+  ks_test_rom "${ROM}" plain 16384 0 65536
+  local original="${WORK}/original.nds"
+  cp "${ROM}" "${original}"
+
+  # Act
+  run ks_test_run "${ROM}"
+
+  # Assert
+  [[ "${status}" -eq 0 ]]
+  cmp "${original}" "${ROM}.bak"
 }
 
 @test "--dry-run lists each cut and changes nothing" {
@@ -443,7 +480,7 @@ teardown() {
   ks_test_shim mv 'exit 1'
 
   # Act
-  run ks_test_run "${ROM}"
+  run ks_test_run --no-backup "${ROM}"
 
   # Assert
   [[ "${status}" -eq 1 ]]

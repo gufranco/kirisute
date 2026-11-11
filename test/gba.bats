@@ -22,7 +22,7 @@ teardown() {
   # Assert
   [[ "${status}" -eq 0 ]]
   ks_test_size_is "${ROM}" 16388
-  [[ "${output}" == *"Trimmed ${ROM} from 64.0 KiB to 16.0 KiB."$'\n'"Trimmed 1 ROM and saved 48.0 KiB." ]]
+  [[ "${output}" == *"Trimmed ${ROM} from 64.0 KiB to 16.0 KiB."$'\n'"The original of ${ROM} is kept as ${ROM}.bak."$'\n'"Trimmed 1 ROM and saved 48.0 KiB." ]]
 }
 
 @test "padding of 00 bytes is cut as well as FF" {

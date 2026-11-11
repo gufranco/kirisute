@@ -52,7 +52,7 @@ compress:
 
 environment:
   KIRISUTE_VERIFY               yes or no, the default for --verify, no
-  KIRISUTE_BACKUP               yes or no, the default for --backup, no
+  KIRISUTE_BACKUP               yes or no, the default for --backup, yes
   KIRISUTE_FORMAT               the default for --format, cso2
   KIRISUTE_BLOCK                the default for --block, 8192
   KIRISUTE_LZ4_COST             the default for --lz4-cost, 0

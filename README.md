@@ -111,12 +111,12 @@ maxcso             ok       /opt/homebrew/bin/maxcso, 1.13.0
 | `--dry-run` | List what would be trimmed or renamed and change nothing |
 | `--info` | Print each ROM's header: title, code, the fields its system adds, trimmed size and padding |
 | `--verify`, `--no-verify` | Trim only a ROM whose padding holds nothing but `00` or `FF` bytes |
-| `--backup`, `--no-backup` | Keep each original as `<rom>.bak` |
+| `--backup`, `--no-backup` | Keep each original as `<rom>.bak`, or the first free `<rom>.bak.N`; on by default |
 | `--recursive` | Look for ROM files in every subfolder too |
 | `--json` | Print the result as one JSON object, for scripts |
 | `--theme <name>` | Colours of the terminal interface |
 
-`KIRISUTE_VERIFY=yes` and `KIRISUTE_BACKUP=yes` make `--verify` and `--backup` the default; an option on the command line wins. kirisute follows the shared command-line contract of its family, described in [FAMILY.md](FAMILY.md).
+`KIRISUTE_VERIFY=yes` makes `--verify` the default and `KIRISUTE_BACKUP=no` turns the backup off; an option on the command line wins. kirisute follows the shared command-line contract of its family, described in [FAMILY.md](FAMILY.md).
 
 ```bash
 kirisute --dry-run *.nds *.3ds           # see what trimming would save
@@ -151,7 +151,7 @@ export KODOUGU_THEME=catppuccin-mocha
 - Each file is checked before it is touched. A DS or Game Boy Advance ROM needs a correct logo and header checksum; a 3DS image needs the NCSD magic, a media ID and partitions in order, and a console NAND image is refused; a PSP image needs the system name `PSP GAME`, `UMD VIDEO` or `UMD AUDIO`, or a `PSP_GAME` folder. A file that fails, that is too small for a header, or whose header declares more than the file holds, stays as it is with a warning, and the run ends with status 1.
 - Without `--verify`, the bytes past the real size are dropped whatever they hold. With it, a ROM with anything but `00` or `FF` there stays as it is, and the warning names the first such byte.
 - A PSP image always gets that check. Dumpers size an image by the disc's last sector rather than by its file system, and a game can read sectors outside its files, so kirisute never cuts data it cannot prove is padding. It never removes anything inside the volume either: update data, padding files and videos all stay. A development DVD-R image holding `USER_L0.IMG` and `USER_L1.IMG` is refused until its two layers are joined.
-- A trimmed file no longer matches the checksum of an untrimmed dump in databases such as Redump or No-Intro. `--backup` keeps the original.
+- A trimmed file no longer matches the checksum of an untrimmed dump in databases such as Redump or No-Intro, so each original is kept as `<rom>.bak` unless `--no-backup` says otherwise.
 - Each trimmed ROM is written to a temporary file beside it, given the original's permissions and renamed over it, so an interrupted run never leaves half a file.
 - A folder gives only the files with the extensions above directly inside it, in any case; `--recursive` walks up to 32 folders deep. A file given by name with another extension is read as a DS ROM. Symbolic links, hidden files such as `._game.nds`, and hidden folders are left alone.
 

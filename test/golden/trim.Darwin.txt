@@ -5,7 +5,10 @@ Plan:   cut each ROM to the size its header declares
 
 kirisute: warning: WORK/library/broken.nds has a bad header checksum, so it stays as it is.
 Trimmed WORK/library/download-play.nds from 64.0 KiB to 16.1 KiB, keeping its download-play certificate.
+The original of WORK/library/download-play.nds is kept as WORK/library/download-play.nds.bak.
 Trimmed WORK/library/dsi.nds from 64.0 KiB to 32.0 KiB, keeping its DSi area.
+The original of WORK/library/dsi.nds is kept as WORK/library/dsi.nds.bak.
 Trimmed WORK/library/plain.nds from 64.0 KiB to 16.0 KiB.
+The original of WORK/library/plain.nds is kept as WORK/library/plain.nds.bak.
 WORK/library/trimmed.nds is already at its real size, 16.0 KiB.
 Trimmed 3 of 5 ROMs and saved 127.9 KiB.

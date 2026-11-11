@@ -165,7 +165,7 @@ ks_args_settings() {
     KS_VERIFY="$(ks_args_env KIRISUTE_VERIFY "${KIRISUTE_VERIFY:-no}")" || return 1
   fi
   if [ -z "${KS_BACKUP}" ]; then
-    KS_BACKUP="$(ks_args_env KIRISUTE_BACKUP "${KIRISUTE_BACKUP:-no}")" || return 1
+    KS_BACKUP="$(ks_args_env KIRISUTE_BACKUP "${KIRISUTE_BACKUP:-yes}")" || return 1
   fi
   [ "${KS_MODE}" != compress ] || ks_args_compress_env
 }

@@ -22,7 +22,7 @@ teardown() {
   # Assert
   [[ "${status}" -eq 0 ]]
   ks_test_size_is "${ISO}" 131072
-  [[ "${output}" == *"Trimmed ${ISO} from 256.0 KiB to 128.0 KiB."$'\n'"Trimmed 1 ROM and saved 128.0 KiB." ]]
+  [[ "${output}" == *"Trimmed ${ISO} from 256.0 KiB to 128.0 KiB."$'\n'"The original of ${ISO} is kept as ${ISO}.bak."$'\n'"Trimmed 1 ROM and saved 128.0 KiB." ]]
 }
 
 @test "--info prints a PSP ISO's title, disc ID and volume" {

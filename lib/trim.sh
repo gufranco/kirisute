@@ -29,12 +29,12 @@ ks_trim_swap() {
     ks_error "could not put the trimmed copy in place of $1, so it stays as it was."
     return 1
   fi
-  if ! mv -f -- "$1" "$1.bak"; then
-    ks_error "could not keep $1 as $1.bak, so it stays as it was."
+  if ! mv -f -- "$1" "${KS_BACKUP_NAME}"; then
+    ks_error "could not keep $1 as ${KS_BACKUP_NAME}, so it stays as it was."
     return 1
   fi
   mv -f -- "${KS_TMP}" "$1" && return 0
-  mv -f -- "$1.bak" "$1"
+  mv -f -- "${KS_BACKUP_NAME}" "$1"
   ks_error "could not put the trimmed copy in place of $1, so it stays as it was."
   return 1
 }

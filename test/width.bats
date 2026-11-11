@@ -71,11 +71,11 @@ widest_line() {
   ks_test_rom "${TARGET}/game.nds" plain 16384 0 65536
 
   # Act
-  KS_DRY_RUN=yes KS_DEPTH_MAX=0 KS_BACKUP=yes run ks_test_run "${TARGET}"
+  KS_DRY_RUN=yes KS_DEPTH_MAX=0 KS_BACKUP=no run ks_test_run "${TARGET}"
 
   # Assert
   [[ "${status}" -eq 0 ]]
   [[ "${output}" == *"Trimmed 1 ROM and saved 48.0 KiB."* ]]
   ks_test_size_is "${TARGET}/game.nds" 16384
-  [[ ! -e "${TARGET}/game.nds.bak" ]]
+  ks_test_size_is "${TARGET}/game.nds.bak" 65536
 }

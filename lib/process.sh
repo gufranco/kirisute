@@ -59,9 +59,19 @@ ks_ready() {
     fi
   fi
   [ "${KS_BACKUP}" = yes ] && [ "${KS_DRY_RUN}" = no ] || return 0
-  [ -e "$1.bak" ] || [ -L "$1.bak" ] || return 0
-  KS_REASON="has a $1.bak already"
+  ks_backup_name "$1" && return 0
+  KS_REASON="has $1.bak to $1.bak.99 already"
   return 1
+}
+
+ks_backup_name() {
+  KS_BACKUP_NAME="$1.bak"
+  ks_bn_count=1
+  while [ -e "${KS_BACKUP_NAME}" ] || [ -L "${KS_BACKUP_NAME}" ]; do
+    [ "${ks_bn_count}" -lt 100 ] || return 1
+    KS_BACKUP_NAME="$1.bak.${ks_bn_count}"
+    ks_bn_count=$((ks_bn_count + 1))
+  done
 }
 
 ks_cut() {
@@ -83,6 +93,7 @@ ks_cut() {
   fi
   ks_record "${ks_cu_status}" "" "$1"
   [ "${KS_JSON}" = yes ] || ks_say "${ks_cu_verb} $1 from ${ks_cu_before} to ${ks_cu_after}${ks_cu_keeps}."
+  [ "${KS_JSON}" = yes ] || [ "${KS_DRY_RUN}" = yes ] || [ "${KS_BACKUP}" = no ] || ks_say "The original of $1 is kept as ${KS_BACKUP_NAME}."
 }
 
 ks_process() {
